@@ -1,3 +1,5 @@
+<<<<<<< HEAD
+
 # onlineCoursePlatform
 
 This application was generated using JHipster 8.9.0, you can find documentation and help at [https://www.jhipster.tech/documentation-archive/v8.9.0](https://www.jhipster.tech/documentation-archive/v8.9.0).
@@ -236,4 +238,9 @@ To configure CI for your project, run the ci-cd sub-generator (`jhipster ci-cd`)
 [Node.js]: https://nodejs.org/
 [NPM]: https://www.npmjs.com/
 [Leaflet]: https://leafletjs.com/
-[DefinitelyTyped]: https://definitelytyped.org/
+
+# [DefinitelyTyped]: https://definitelytyped.org/
+
+# Edu
+
+> > > > > > > adc7bc7414f33bca216a3eb03e7a8d7aa04a892d
