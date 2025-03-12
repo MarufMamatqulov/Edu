@@ -100,4 +100,6 @@ jhipster:
 # https://www.jhipster.tech/common-application-properties/
 # ===================================================================
 
+file:
+  upload-dir: ./uploads
 # application:

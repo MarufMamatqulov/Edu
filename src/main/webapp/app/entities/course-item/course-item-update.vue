@@ -1,7 +1,7 @@
 <template>
   <div class="row justify-content-center">
     <div class="col-8">
-      <form name="editForm" novalidate @submit.prevent="save()">
+      <form name="editForm" novalidate @submit.prevent="save">
         <h2
           id="onlineCoursePlatformApp.courseItem.home.createOrEditLabel"
           data-cy="CourseItemCreateUpdateHeading"
@@ -76,7 +76,13 @@
               </option>
             </select>
           </div>
-          <div class="form-group">
+
+          <!-- Dinamik shakl maydoni: -->
+          <div v-if="v$.contentType.$model === 'UPLOADED_VIDEO'" class="form-group">
+            <label for="videoFile">Video fayl</label>
+            <input type="file" class="form-control" id="videoFile" @change="handleFileUpload" accept="video/*" />
+          </div>
+          <div v-else-if="v$.contentType.$model === 'YOUTUBE_VIDEO'" class="form-group">
             <label class="form-control-label" v-text="t$('onlineCoursePlatformApp.courseItem.content')" for="course-item-content"></label>
             <input
               type="text"
@@ -88,7 +94,20 @@
               v-model="v$.content.$model"
             />
           </div>
-          <div class="form-group">
+          <div v-else-if="v$.contentType.$model === 'TEXT'" class="form-group">
+            <label class="form-control-label" v-text="t$('onlineCoursePlatformApp.courseItem.content')" for="course-item-content"></label>
+            <textarea
+              class="form-control"
+              name="content"
+              id="course-item-content"
+              data-cy="content"
+              :class="{ valid: !v$.content.$invalid, invalid: v$.content.$invalid }"
+              v-model="v$.content.$model"
+              rows="4"
+            ></textarea>
+          </div>
+
+          <div class="form-group" v-if="v$.itemType.$model === 'TEST'">
             <label
               class="form-control-label"
               v-text="t$('onlineCoursePlatformApp.courseItem.passingScore')"
@@ -119,7 +138,7 @@
           </div>
         </div>
         <div>
-          <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" @click="previousState()">
+          <button type="button" id="cancel-save" data-cy="entityCreateCancelButton" class="btn btn-secondary" @click="previousState">
             <font-awesome-icon icon="ban"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.cancel')"></span>
           </button>
           <button
@@ -136,4 +155,5 @@
     </div>
   </div>
 </template>
+
 <script lang="ts" src="./course-item-update.component.ts"></script>
