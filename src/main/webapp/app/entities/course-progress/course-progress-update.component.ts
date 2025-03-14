@@ -6,7 +6,6 @@ import { useVuelidate } from '@vuelidate/core';
 import CourseProgressService from './course-progress.service';
 import { useValidation } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
-
 import UserService from '@/entities/user/user.service';
 import CourseService from '@/entities/course/course.service';
 import { type ICourse } from '@/shared/model/course.model';

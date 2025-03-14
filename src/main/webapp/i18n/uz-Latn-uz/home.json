@@ -1,13 +1,13 @@
 {
   "home": {
-    "title": "Java Hipsterga, hush kelibsiz!",
+    "title": "Onlyn ta'lim platformasiga, hush kelibsiz!",
     "subtitle": "Bosh sahifa",
     "logged": {
       "message": "Siz \"{ username }\" foydalanuvchisi sifatida kirdiz."
     },
-    "question": "JHipster bo`yicha savollaringiz bo`lsa:",
+    "question": "Platforma bo`yicha savollaringiz bo`lsa:",
     "link": {
-      "homepage": "JHipster bosh sahifasi",
+      "homepage": "Platforma bosh sahifasi",
       "stackoverflow": "JHipster Stack Overflow",
       "bugtracker": "JHipster bag trekeri",
       "chat": "JHipster umumiy chat xonasi",
