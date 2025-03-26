@@ -3,7 +3,7 @@
     <div class="container">
       <div class="footer-top">
         <div class="footer-logo">
-          <img :src="ramzImage" alt="Platform Logo" class="logo" />
+          <img :src="ramzImage" alt="Logo" />
           <p>Empowering learners with AI-driven education solutions.</p>
         </div>
         <div class="footer-links">
@@ -30,13 +30,13 @@
 </template>
 
 <script lang="ts">
-import ramzLogo from '../../../assets/images/ramz.png'
+import ramzLogo from '@assets/images/ramz.png';
 
 export default {
   name: 'JhiFooter',
   data() {
     return {
-      ramzImage: ramzLogo, // <-- nomlar bir xil bo'lishi kerak
+      ramzImage: ramzLogo,
     };
   },
 };
