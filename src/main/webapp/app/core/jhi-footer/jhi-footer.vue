@@ -30,13 +30,13 @@
 </template>
 
 <script lang="ts">
-import ramzImage from '/s/Edu/src/assets/images/ramz.png';
+import ramzLogo from '../../../assets/images/ramz.png'
 
 export default {
   name: 'JhiFooter',
   data() {
     return {
-      ramzImage,
+      ramzImage: ramzLogo, // <-- nomlar bir xil bo'lishi kerak
     };
   },
 };
