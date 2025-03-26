@@ -1,13 +1,11 @@
 import { URL, fileURLToPath } from 'node:url';
 import { defineConfig, normalizePath } from 'vite';
-
 import vue from '@vitejs/plugin-vue';
 import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 const { getAbsoluteFSPath } = await import('swagger-ui-dist');
 const swaggerUiPath = getAbsoluteFSPath();
 
-// eslint-disable-next-line prefer-const
 const config = defineConfig({
   plugins: [
     vue(),
@@ -42,6 +40,7 @@ const config = defineConfig({
       vue: '@vue/compat/dist/vue.esm-bundler.js',
       '@': fileURLToPath(new URL('./src/main/webapp/app/', import.meta.url)),
       '@content': fileURLToPath(new URL('./src/main/webapp/content/', import.meta.url)),
+      '@assets': fileURLToPath(new URL('./src/main/webapp/assets/', import.meta.url)), // ✅ qo‘shildi
     },
   },
   define: {
