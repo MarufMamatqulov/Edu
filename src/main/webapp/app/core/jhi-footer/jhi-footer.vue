@@ -1,12 +1,16 @@
 <template>
   <footer class="footer">
-    <div class="container">
+    <!-- Gradient fon beradigan qism -->
+    <div class="footer-gradient">
       <div class="footer-top">
-        <div class="footer-logo">
-          <img :src="ramzImage" alt="Logo" />
-          <p>Empowering learners with AI-driven education solutions.</p>
+        <!-- Logo va qisqacha matn -->
+        <div class="footer-section">
+          <img :src="ramzImage" alt="Platform Logo" class="logo" />
+          <p class="tagline">Empowering learners with AI-driven education solutions.</p>
         </div>
-        <div class="footer-links">
+
+        <!-- Tezkor havolalar -->
+        <div class="footer-section">
           <h3>Quick Links</h3>
           <ul>
             <li><a href="/about">About Us</a></li>
@@ -15,22 +19,32 @@
             <li><a href="/contact">Contact</a></li>
           </ul>
         </div>
-        <div class="footer-contact">
+
+        <!-- Kontakt ma'lumotlari -->
+        <div class="footer-section">
           <h3>Contact Us</h3>
           <p>Email: marufbekofficial2@gmail.com</p>
           <p>Phone: +123 456 7890</p>
           <p>Address: 123 Education St, Learning City</p>
         </div>
       </div>
-      <div class="footer-bottom">
-        <p>&copy; {{ new Date().getFullYear() }} OnlineCoursePlatform. All rights reserved.</p>
+
+      <!-- Ijtimoiy tarmoqlar ikonkalari -->
+      <div class="footer-social">
+        <a href="#" target="_blank"><i class="fab fa-facebook-f"></i></a>
+        <a href="#" target="_blank"><i class="fab fa-twitter"></i></a>
+        <a href="#" target="_blank"><i class="fab fa-instagram"></i></a>
+        <a href="#" target="_blank"><i class="fab fa-linkedin-in"></i></a>
       </div>
     </div>
+
+    <!-- Quyidagi satr butun kenglikda, matn markazda -->
+    <div class="footer-bottom">&copy; {{ new Date().getFullYear() }} OnlineCoursePlatform. All rights reserved.</div>
   </footer>
 </template>
 
 <script lang="ts">
-import ramzLogo from '@assets/images/ramz.png';
+import ramzLogo from '@/assets/images/ramz.png';
 
 export default {
   name: 'JhiFooter',
@@ -43,62 +57,102 @@ export default {
 </script>
 
 <style scoped>
+/* Footer butun ekranni egallashi uchun */
 .footer {
-  background: #2c3e50;
-  color: white;
-  padding: 20px 0;
-  text-align: center;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  color: #fff;
+  font-family: sans-serif;
 }
 
-.container {
-  width: 80%;
-  margin: auto;
+/* Gradient fon */
+.footer-gradient {
+  background: linear-gradient(90deg, #2c3e50, #34495e);
+  width: 100%;
+  padding: 20px 0; /* faqat vertikal bo'sh joy */
+  margin: 0;
 }
 
+/* Ustki qism: logo, quick links, contact */
 .footer-top {
   display: flex;
-  justify-content: space-between;
   flex-wrap: wrap;
-  padding-bottom: 20px;
-  border-bottom: 1px solid #555;
+  justify-content: space-between;
+  /* Gorizontal tomonda bo'sh joy yo'q,
+     faqat minimal vertikal uchun padding-top/bottom berish mumkin */
+  padding: 0;
+  margin: 0;
+  width: 100%;
 }
 
-.footer-logo {
-  flex: 1;
-  text-align: left;
+.footer-section {
+  flex: 1 1 200px; /* responsiv bo'lishi uchun */
+  min-width: 200px;
+  padding: 10px; /* Ichkaridan biroz joy beramiz */
+  box-sizing: border-box;
 }
 
+/* Logo */
 .logo {
-  width: 150px;
+  width: 120px;
   margin-bottom: 10px;
 }
 
-.footer-links,
-.footer-contact {
-  flex: 1;
-  text-align: left;
+/* Qisqacha matn */
+.tagline {
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
 }
 
-.footer-links ul {
+/* Quick Links */
+.footer-section ul {
   list-style: none;
+  margin: 0;
   padding: 0;
 }
 
-.footer-links li {
+.footer-section li {
   margin: 5px 0;
 }
 
-.footer-links a {
+.footer-section a {
   color: #f1c40f;
   text-decoration: none;
+  transition: color 0.3s ease;
 }
 
-.footer-links a:hover {
-  text-decoration: underline;
+.footer-section a:hover {
+  color: #f39c12;
 }
 
-.footer-bottom {
+/* Ijtimoiy tarmoqlar ikonkalari */
+.footer-social {
+  width: 100%;
+  text-align: center;
   margin-top: 20px;
-  font-size: 14px;
+}
+
+.footer-social a {
+  display: inline-block;
+  color: #fff;
+  font-size: 1.2rem;
+  margin: 0 10px;
+  transition: color 0.3s ease;
+}
+
+.footer-social a:hover {
+  color: #f1c40f;
+}
+
+/* Pastki qism (copyright) */
+.footer-bottom {
+  background: #222;
+  width: 100%;
+  text-align: center;
+  padding: 15px 0;
+  font-size: 0.85rem;
+  margin: 0;
 }
 </style>

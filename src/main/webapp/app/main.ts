@@ -19,6 +19,8 @@ import '../content/scss/global.scss';
 import '../content/scss/vendor.scss';
 import TranslationService from '@/locale/translation.service';
 
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 const pinia = createPinia();
 
 // jhipster-needle-add-entity-service-to-main-import - JHipster will import entities services here
