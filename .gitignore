@@ -151,3 +151,11 @@ Desktop.ini
 ######################
 coverage/
 .nyc_output/
+
+
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
