@@ -1,5 +1,23 @@
 {
   "home": {
+    "entity": {
+      "action": {
+        "start": "Boshlash"
+      }
+    },
+    "onlineCoursePlatformApp": {
+      "courseItem": {
+        "home": {
+          "title": "Course Itemlar ro'yxati",
+          "notFound": "Hech qanday item topilmadi."
+        },
+        "title": "Sarlavha",
+        "itemType": "Turi",
+        "contentType": "Kontent Turi",
+        "passingScore": "O'tish Balli"
+      }
+    },
+
     "title": "Onlyn ta'lim platformasiga, hush kelibsiz!",
     "subtitle": "Bosh sahifa",
     "logged": {

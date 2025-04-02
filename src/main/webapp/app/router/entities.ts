@@ -8,6 +8,7 @@ const CertificateDetails = () => import('@/entities/certificate/certificate-deta
 const Course = () => import('@/entities/course/course.vue');
 const CourseUpdate = () => import('@/entities/course/course-update.vue');
 const CourseDetails = () => import('@/entities/course/course-details.vue');
+const CourseItems = () => import('@/entities/course-item/CourseItems.vue'); // Add this
 
 const CourseItem = () => import('@/entities/course-item/course-item.vue');
 const CourseItemUpdate = () => import('@/entities/course-item/course-item-update.vue');
@@ -28,8 +29,6 @@ const QuestionDetails = () => import('@/entities/question/question-details.vue')
 const TestAttempt = () => import('@/entities/test-attempt/test-attempt.vue');
 const TestAttemptUpdate = () => import('@/entities/test-attempt/test-attempt-update.vue');
 const TestAttemptDetails = () => import('@/entities/test-attempt/test-attempt-details.vue');
-
-// jhipster-needle-add-entity-to-router-import - JHipster will import entities to the router here
 
 export default {
   path: '/',
@@ -81,6 +80,12 @@ export default {
       path: 'course/:courseId/view',
       name: 'CourseView',
       component: CourseDetails,
+      meta: { authorities: [Authority.USER] },
+    },
+    {
+      path: 'course/:courseId/items', // Add this route
+      name: 'CourseItems',
+      component: CourseItems,
       meta: { authorities: [Authority.USER] },
     },
     {
@@ -203,6 +208,5 @@ export default {
       component: TestAttemptDetails,
       meta: { authorities: [Authority.USER] },
     },
-    // jhipster-needle-add-entity-to-router - JHipster will add entities to the router here
   ],
 };

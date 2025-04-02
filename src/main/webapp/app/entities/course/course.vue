@@ -47,18 +47,31 @@
             </td>
             <td class="text-right">
               <div class="btn-group">
+                <!-- Boshlash button -->
+                <router-link :to="{ name: 'CourseItems', params: { courseId: course.id } }" custom v-slot="{ navigate }">
+                  <button @click="navigate" class="btn btn-success btn-sm">
+                    <font-awesome-icon icon="play"></font-awesome-icon>
+                    <span class="d-none d-md-inline" v-text="t$('entity.action.start')"></span>
+                  </button>
+                </router-link>
+
+                <!-- View button -->
                 <router-link :to="{ name: 'CourseView', params: { courseId: course.id } }" custom v-slot="{ navigate }">
                   <button @click="navigate" class="btn btn-info btn-sm details" data-cy="entityDetailsButton">
                     <font-awesome-icon icon="eye"></font-awesome-icon>
                     <span class="d-none d-md-inline" v-text="t$('entity.action.view')"></span>
                   </button>
                 </router-link>
+
+                <!-- Edit button -->
                 <router-link :to="{ name: 'CourseEdit', params: { courseId: course.id } }" custom v-slot="{ navigate }">
                   <button @click="navigate" class="btn btn-primary btn-sm edit" data-cy="entityEditButton">
                     <font-awesome-icon icon="pencil-alt"></font-awesome-icon>
                     <span class="d-none d-md-inline" v-text="t$('entity.action.edit')"></span>
                   </button>
                 </router-link>
+
+                <!-- Delete button -->
                 <b-button
                   @click="prepareRemove(course)"
                   variant="danger"

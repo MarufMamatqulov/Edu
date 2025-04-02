@@ -17,6 +17,23 @@ export const createRouter = () =>
         component: Home,
       },
       {
+        path: '/course/:courseId/items',
+        name: 'CourseItems',
+        component: () => import('@/entities/course-item/course-items.vue'), // Yangi component
+      },
+
+      {
+        path: '/course/:courseId/lesson/:itemId',
+        name: 'LessonView',
+        component: () => import('@/entities/course-item/lesson-view.vue'),
+      },
+      {
+        path: '/course/:courseId/test/:itemId',
+        name: 'TestView',
+        component: () => import('@/entities/course-item/test-view.vue'),
+      },
+
+      {
         path: '/forbidden',
         name: 'Forbidden',
         component: Error,

@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface CourseItemRepository extends JpaRepository<CourseItem, Long> {
+    List<CourseItem> findByCourseId(Long courseId);
+
     default Optional<CourseItem> findOneWithEagerRelationships(Long id) {
         return this.findOneWithToOneRelationships(id);
     }
