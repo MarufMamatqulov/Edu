@@ -167,8 +167,16 @@ public class CourseResource {
      */
     @GetMapping("/courses/{courseId}/items")
     public ResponseEntity<List<CourseItem>> getCourseItems(@PathVariable Long courseId) {
-        LOG.debug("REST request to get CourseItems for Course : {}", courseId);
+        LOG.debug("REST request to get CourseItems for Course: {}", courseId);
+        // Check if the course exists
+        if (!courseRepository.existsById(courseId)) {
+            LOG.warn("Course with ID {} not found", courseId);
+            return ResponseEntity.notFound().build();
+        }
+        LOG.debug("Course with ID {} exists", courseId);
+        // Fetch the course items
         List<CourseItem> courseItems = courseItemRepository.findByCourseId(courseId);
+        LOG.debug("Found {} CourseItems for Course ID {}: {}", courseItems.size(), courseId, courseItems);
         return ResponseEntity.ok().body(courseItems);
     }
 }

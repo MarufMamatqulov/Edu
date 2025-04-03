@@ -1,144 +1,4 @@
-<!--<template>-->
-<!--  <div class="home-container">-->
-<!--    <div class="row">-->
-<!--      <div class="col-md-12 text-center">-->
-<!--        <h1 class="display-4" v-text="t$('home.title')"></h1>-->
-<!--        <p class="lead" v-text="t$('home.subtitle')"></p>-->
-<!--      </div>-->
-<!--    </div>-->
-
-<!--    &lt;!&ndash; KURS KARTOCHKALARI &ndash;&gt;-->
-<!--    <div class="course-card-list">-->
-<!--      <div-->
-<!--        v-for="course in courses"-->
-<!--        :key="course.id"-->
-<!--        class="course-card"-->
-<!--      >-->
-<!--        &lt;!&ndash; Rasmini ko‘rsatish (ixtiyoriy) &ndash;&gt;-->
-<!--        <img-->
-<!--          v-if="course.imageUrl"-->
-<!--          :src="course.imageUrl"-->
-<!--          class="course-image"-->
-<!--          alt="Kurs rasm"-->
-<!--        />-->
-
-<!--        <div class="course-body">-->
-<!--          <h3 class="course-title">{{ course.title }}</h3>-->
-<!--          <p class="course-description">{{ course.description }}</p>-->
-<!--          &lt;!&ndash; Narx yoki “Bepul” degan yozuv &ndash;&gt;-->
-<!--          <p class="course-price">-->
-<!--            {{ course.price && course.price > 0 ? (course.price + ' so‘m') : 'Bepul' }}-->
-<!--          </p>-->
-<!--        </div>-->
-
-<!--        <button-->
-<!--          class="course-start-button"-->
-<!--          @click="goToCourseItems(course.id)"-->
-<!--        >-->
-<!--          Boshlash-->
-<!--        </button>-->
-<!--      </div>-->
-<!--    </div>-->
-<!--  </div>-->
-<!--</template>-->
-
-<!--<script lang="ts">-->
-<!--import { defineComponent, onMounted, ref } from 'vue';-->
-<!--import CourseService from '@/entities/course/course.service';-->
-
-<!--export default defineComponent({-->
-<!--  name: 'Home',-->
-<!--  setup() {-->
-<!--    const courses = ref<any[]>([]);-->
-<!--    const courseService = new CourseService();-->
-
-<!--    // Sahifa yuklangandan so‘ng backenddan kurslar ro‘yxatini olish-->
-<!--    onMounted(async () => {-->
-<!--      try {-->
-<!--        const response = await courseService.retrieve(); // /api/courses bo‘lishi kerak-->
-<!--        courses.value = response.data;-->
-<!--      } catch (error) {-->
-<!--        console.error('Kurslarni olishda xatolik:', error);-->
-<!--      }-->
-<!--    });-->
-
-<!--    // Boshlash tugmasini bosilganda kurs itemlari sahifasiga o‘tish-->
-<!--    const goToCourseItems = (courseId: number) => {-->
-<!--      // /course/:courseId/items ro‘yxatiga navigatsiya-->
-<!--      window.location.href = `/course/${courseId}/items`;-->
-<!--      // yoki vue-router bilan: this.$router.push({ name: 'CourseItems', params: { courseId } });-->
-<!--    };-->
-
-<!--    return {-->
-<!--      courses,-->
-<!--      goToCourseItems,-->
-<!--    };-->
-<!--  },-->
-<!--});-->
-<!--</script>-->
-
-<!--<style scoped>-->
-<!--.home-container {-->
-<!--  max-width: 1200px;-->
-<!--  margin: 0 auto;-->
-<!--  padding: 20px;-->
-<!--}-->
-<!--.course-card-list {-->
-<!--  display: flex;-->
-<!--  flex-wrap: wrap; /* bir qatorda sığmagan kartalar keyingi qatorga o‘tishi uchun */-->
-<!--  gap: 20px;-->
-<!--  justify-content: center; /* markazga jamlash */-->
-<!--}-->
-<!--.course-card {-->
-<!--  width: 280px;-->
-<!--  border: 1px solid #e0e0e0;-->
-<!--  border-radius: 8px;-->
-<!--  overflow: hidden;-->
-<!--  background-color: #fff;-->
-<!--  display: flex;-->
-<!--  flex-direction: column;-->
-<!--  justify-content: space-between;-->
-<!--}-->
-<!--.course-image {-->
-<!--  width: 100%;-->
-<!--  height: 160px;-->
-<!--  object-fit: cover;-->
-<!--}-->
-<!--.course-body {-->
-<!--  padding: 16px;-->
-<!--}-->
-<!--.course-title {-->
-<!--  font-size: 1.2rem;-->
-<!--  margin-bottom: 8px;-->
-<!--  font-weight: bold;-->
-<!--  color: #333;-->
-<!--}-->
-<!--.course-description {-->
-<!--  font-size: 0.95rem;-->
-<!--  color: #666;-->
-<!--  margin-bottom: 12px;-->
-<!--}-->
-<!--.course-price {-->
-<!--  font-weight: bold;-->
-<!--  margin-bottom: 12px;-->
-<!--  color: #007bff;-->
-<!--}-->
-<!--.course-start-button {-->
-<!--  border: none;-->
-<!--  background-color: #007bff;-->
-<!--  color: #fff;-->
-<!--  padding: 12px;-->
-<!--  font-size: 1rem;-->
-<!--  cursor: pointer;-->
-<!--  text-align: center;-->
-<!--  width: 100%;-->
-<!--  transition: background-color 0.3s ease;-->
-<!--}-->
-<!--.course-start-button:hover {-->
-<!--  background-color: #0056b3;-->
-<!--}-->
-<!--</style>-->
-
+<!-- src/main/webapp/app/core/home/home.vue -->
 <template>
   <div class="home-container">
     <!-- Header Section -->
@@ -156,7 +16,12 @@
 
     <!-- Course List -->
     <div v-else class="course-card-list">
-      <div v-for="course in courses" :key="course.id" class="course-card">
+      <div
+        v-for="course in courses"
+        :key="course.id"
+        class="course-card"
+        v-bind="course as { id: number; title: string; description: string; price: number; imageUrl: string | null }"
+      >
         <img v-if="course.imageUrl" :src="course.imageUrl" class="course-image" alt="Course Image" />
         <div class="course-body">
           <h3 class="course-title">{{ course.title }}</h3>
@@ -164,6 +29,28 @@
           <p class="course-price">
             {{ course.price && course.price > 0 ? course.price + ' so‘m' : 'Bepul' }}
           </p>
+
+          <!-- Course Items (YouTube Videos) -->
+          <div v-if="course.items && course.items.length > 0" class="course-items">
+            <h4>YouTube Videolar</h4>
+            <div v-for="item in course.items.filter(item => item.contentType === 'YOUTUBE_VIDEO')" :key="item.id" class="course-item">
+              <h5>{{ item.title }}</h5>
+              <div v-if="getYouTubeEmbedUrl(item.content)" class="video-wrapper">
+                <iframe
+                  :src="getYouTubeEmbedUrl(item.content)"
+                  frameborder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowfullscreen
+                  class="youtube-video"
+                ></iframe>
+              </div>
+              <p v-else class="invalid-video-url">YouTube video URL noto'g'ri: {{ item.content }}</p>
+            </div>
+            <p v-if="!course.items.some(item => item.contentType === 'YOUTUBE_VIDEO')" class="no-videos">
+              Ushbu kursda YouTube videolar mavjud emas.
+            </p>
+          </div>
+          <div v-else class="no-videos">Ushbu kursda hech qanday elementlar mavjud emas.</div>
         </div>
         <button class="course-start-button" @click="goToCourseItems(course.id)">Boshlash</button>
       </div>
@@ -177,22 +64,21 @@
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
 import CourseService from '@/entities/course/course.service';
+import axios from 'axios';
 
 export default defineComponent({
   name: 'Home',
   setup() {
     const courses = ref<any[]>([]);
-    const loading = ref(true); // Add loading state
+    const loading = ref(true);
     const courseService = new CourseService();
 
-    // Fetch courses on component mount
     onMounted(async () => {
       try {
         const response = await courseService.retrieve();
-        console.log('API Response:', response); // Log the full response
-        console.log('API Response Data:', response.data); // Log the data
+        console.log('API Response:', response);
+        console.log('API Response Data:', response.data);
 
-        // Handle different possible response structures
         let fetchedCourses = [];
         if (Array.isArray(response.data)) {
           fetchedCourses = response.data;
@@ -202,33 +88,70 @@ export default defineComponent({
           console.warn('Unexpected API response structure:', response.data);
         }
 
-        // Map the data to ensure it matches the template
+        const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
+        if (!token) {
+          console.error('No JWT token found. Please log in.');
+          loading.value = false;
+          return;
+        }
+
+        for (const course of fetchedCourses) {
+          try {
+            const itemsResponse = await axios.get(`/api/courses/${course.id}/items`, {
+              headers: {
+                Authorization: `Bearer ${token}`,
+              },
+            });
+            console.log(`Items for course ${course.id}:`, itemsResponse.data);
+            course.items = itemsResponse.data;
+          } catch (error) {
+            console.error(`Error fetching items for course ${course.id}:`, error);
+            course.items = [];
+          }
+        }
+
         courses.value = fetchedCourses.map(course => ({
           id: course.id,
-          title: course.title || course.name || 'Untitled Course', // Fallback for title
+          title: course.title || course.name || 'Untitled Course',
           description: course.description || 'No description available',
           price: course.price || 0,
-          imageUrl: course.imageUrl || course.image || null, // Fallback for image
+          imageUrl: course.imageUrl || course.image || null,
+          items: course.items || [],
         }));
 
-        console.log('Mapped Courses:', courses.value); // Log the final courses array
+        console.log('Mapped Courses with Items:', courses.value);
       } catch (error) {
         console.error('Error fetching courses:', error);
       } finally {
-        loading.value = false; // Stop loading
+        loading.value = false;
       }
     });
 
-    // Navigate to course items page
     const goToCourseItems = (courseId: number) => {
-      window.location.href = `/course/${courseId}/items`;
+      (window as any).location.href = `/course/${courseId}/items`;
+    };
+
+    const getYouTubeEmbedUrl = (url: string): string => {
+      try {
+        const videoIdMatch = url.match(/(?:v=)([^&]+)/) || url.match(/(?:youtu\.be\/)([^?]+)/);
+        const videoId = videoIdMatch ? videoIdMatch[1] : null;
+        if (!videoId) {
+          console.error('Invalid YouTube URL:', url);
+          return '';
+        }
+        return `https://www.youtube.com/embed/${videoId}`;
+      } catch (error) {
+        console.error('Error parsing YouTube URL:', error);
+        return '';
+      }
     };
 
     return {
       courses,
       loading,
       goToCourseItems,
-      t$: (key: string) => key, // Mock translation function (replace with your actual i18n setup)
+      getYouTubeEmbedUrl,
+      t$: (key: string) => key,
     };
   },
 });
@@ -287,6 +210,41 @@ export default defineComponent({
   font-weight: bold;
   margin-bottom: 12px;
   color: #007bff;
+}
+
+.course-items {
+  margin-top: 12px;
+}
+
+.course-item {
+  margin-bottom: 16px;
+}
+
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%;
+  height: 0;
+  overflow: hidden;
+}
+
+.youtube-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.invalid-video-url {
+  font-size: 0.9rem;
+  color: #dc3545;
+  font-style: italic;
+}
+
+.no-videos {
+  font-size: 0.9rem;
+  color: #666;
+  font-style: italic;
 }
 
 .course-start-button {

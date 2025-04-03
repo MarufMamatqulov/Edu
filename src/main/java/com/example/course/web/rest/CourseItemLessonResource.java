@@ -24,7 +24,7 @@ import tech.jhipster.web.util.ResponseUtil;
 
 @RestController
 @RequestMapping("/api")
-public class CourseItemLessonResource {
+public class CourseItemLessonResource { // /course/${courseId}/items`
 
     private static final Logger LOG = LoggerFactory.getLogger(CourseItemLessonResource.class);
     private static final String ENTITY_NAME = "courseItem";

@@ -1,107 +1,130 @@
-<!-- src/main/webapp/app/entities/course-item/lesson-view.vue -->
+<!-- src/main/webapp/app/entities/course/lesson-view.vue -->
 <template>
-  <div>
-    <h2 id="lesson-heading" data-cy="LessonHeading">
-      <span v-text="$t('onlineCoursePlatformApp.lesson.title')"></span>
-    </h2>
-
-    <div v-if="isFetching" class="alert alert-info">
-      <span v-text="$t('onlineCoursePlatformApp.lesson.loading')"></span>
+  <div class="lesson-view-container">
+    <h2 class="lesson-title">{{ lesson?.title }}</h2>
+    <div v-if="isFetching" class="alert alert-info text-center">Yuklanmoqda...</div>
+    <div v-else-if="lesson" class="lesson-content">
+      <div v-if="lesson.contentType === 'YOUTUBE_VIDEO'" class="video-wrapper">
+        <iframe
+          v-if="getYouTubeEmbedUrl(lesson.content)"
+          :src="getYouTubeEmbedUrl(lesson.content)"
+          frameborder="0"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowfullscreen
+          class="youtube-video"
+        ></iframe>
+        <p v-else class="invalid-video-url">YouTube video URL noto'g'ri: {{ lesson.content }}</p>
+      </div>
+      <div v-else class="text-content">
+        {{ lesson.content }}
+      </div>
     </div>
-
-    <div v-else-if="courseItem">
-      <dl class="row jh-entity-details">
-        <dt>
-          <span v-text="$t('onlineCoursePlatformApp.courseItem.title')"></span>
-        </dt>
-        <dd>{{ courseItem.title }}</dd>
-
-        <dt>
-          <span v-text="$t('onlineCoursePlatformApp.courseItem.itemType')"></span>
-        </dt>
-        <dd>{{ courseItem.itemType }}</dd>
-
-        <dt>
-          <span v-text="$t('onlineCoursePlatformApp.courseItem.contentType')"></span>
-        </dt>
-        <dd>{{ courseItem.contentType || '-' }}</dd>
-
-        <dt>
-          <span v-text="$t('onlineCoursePlatformApp.courseItem.content')"></span>
-        </dt>
-        <dd>{{ courseItem.content }}</dd>
-
-        <dt>
-          <span v-text="$t('onlineCoursePlatformApp.courseItem.course')"></span>
-        </dt>
-        <dd>{{ courseItem.course ? courseItem.course.title : '' }}</dd>
-      </dl>
-
-      <button type="button" class="btn btn-secondary" @click="goBack">
-        <font-awesome-icon icon="arrow-left"></font-awesome-icon>
-        <span v-text="$t('entity.action.back')"></span>
-      </button>
-    </div>
-
-    <div v-else class="alert alert-warning">
-      <span v-text="$t('onlineCoursePlatformApp.courseItem.notFound')"></span>
-    </div>
+    <div v-else class="alert alert-warning text-center">Dars topilmadi.</div>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 import axios from 'axios';
-import { useI18n } from 'vue-i18n';
-import { useAlertService } from '@/shared/alert/alert.service';
 
 export default defineComponent({
   name: 'LessonView',
   setup() {
-    const { t: t$ } = useI18n();
     const route = useRoute();
-    const router = useRouter();
-    const alertService = useAlertService();
-    const courseItem = ref<any>(null);
+    const lesson = ref<any>(null);
     const isFetching = ref(false);
+    const courseId = ref(route.params.courseId);
+    const itemId = ref(route.params.itemId);
 
-    // Get the itemId from the route params
-    const itemId = route.params.itemId;
-    console.log('Item ID from route:', itemId); // Debug: Check if itemId is correct
-
-    // Fetch the course item details
-    const retrieveCourseItem = async () => {
+    const fetchLesson = async () => {
       isFetching.value = true;
       try {
-        const response = await axios.get(`/api/course-items/${itemId}`);
-        console.log('CourseItem response:', response.data); // Debug: Log the response
-        courseItem.value = response.data;
-        console.log('CourseItem set to:', courseItem.value); // Debug: Confirm the ref is updated
-      } catch (error) {
-        console.error('Error fetching course item:', error); // Debug: Log any errors
-        alertService.showHttpError(error.response);
+        const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
+        if (!token) {
+          throw new Error('No JWT token found');
+        }
+        const res = await axios.get(`/api/course-items/${itemId.value}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        lesson.value = res.data;
+      } catch (err) {
+        console.error('Error fetching lesson:', err);
       } finally {
         isFetching.value = false;
       }
     };
 
-    // Go back to the previous page
-    const goBack = () => {
-      router.go(-1);
+    const getYouTubeEmbedUrl = (url: string): string => {
+      try {
+        const videoIdMatch = url.match(/(?:v=)([^&]+)/) || url.match(/(?:youtu\.be\/)([^?]+)/);
+        const videoId = videoIdMatch ? videoIdMatch[1] : null;
+        if (!videoId) {
+          console.error('Invalid YouTube URL:', url);
+          return '';
+        }
+        return `https://www.youtube.com/embed/${videoId}`;
+      } catch (error) {
+        console.error('Error parsing YouTube URL:', error);
+        return '';
+      }
     };
 
     onMounted(() => {
-      console.log('LessonView mounted'); // Debug: Confirm component is mounted
-      retrieveCourseItem();
+      fetchLesson();
     });
 
     return {
-      courseItem,
+      lesson,
       isFetching,
-      goBack,
-      t$,
+      getYouTubeEmbedUrl,
     };
   },
 });
 </script>
+
+<style scoped>
+.lesson-view-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.lesson-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.video-wrapper {
+  position: relative;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.youtube-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.invalid-video-url {
+  font-size: 0.9rem;
+  color: #dc3545;
+  font-style: italic;
+}
+
+.text-content {
+  font-size: 1rem;
+  color: #333;
+}
+
+.text-center {
+  text-align: center;
+}
+</style>

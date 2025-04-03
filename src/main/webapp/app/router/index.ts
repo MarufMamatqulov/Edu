@@ -1,5 +1,6 @@
 import { createRouter as createVueRouter, createWebHistory } from 'vue-router';
-
+import LessonView from '@/entities/course-item/lesson-view.vue';
+import TestView from '@/entities/course-item/test-view.vue';
 const Home = () => import('@/core/home/home.vue');
 const Error = () => import('@/core/error/error.vue');
 import account from '@/router/account';
@@ -20,6 +21,17 @@ export const createRouter = () =>
         path: '/course/:courseId/items',
         name: 'CourseItems',
         component: () => import('@/entities/course-item/course-items.vue'), // Yangi component
+      },
+
+      {
+        path: '/course/:courseId/lesson/:itemId',
+        name: 'LessonView',
+        component: LessonView,
+      },
+      {
+        path: '/course/:courseId/test/:itemId',
+        name: 'TestView',
+        component: TestView,
       },
 
       {

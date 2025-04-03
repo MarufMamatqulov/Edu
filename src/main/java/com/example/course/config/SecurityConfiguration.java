@@ -1,3 +1,4 @@
+// src/main/java/com/example/course/config/SecurityConfiguration.java
 package com.example.course.config;
 
 import static org.springframework.security.config.Customizer.withDefaults;
@@ -45,7 +46,20 @@ public class SecurityConfiguration {
             .addFilterAfter(new SpaWebFilter(), BasicAuthenticationFilter.class)
             .headers(headers ->
                 headers
-                    .contentSecurityPolicy(csp -> csp.policyDirectives(jHipsterProperties.getSecurity().getContentSecurityPolicy()))
+                    .contentSecurityPolicy(csp ->
+                        csp.policyDirectives(
+                            "default-src 'self'; " +
+                            "connect-src 'self' http://localhost:7777 ws://localhost:7777; " +
+                            "script-src 'self' 'unsafe-eval'; " +
+                            "style-src 'self' 'unsafe-inline'; " +
+                            "img-src 'self' data:; " +
+                            "font-src 'self'; " +
+                            "frame-src 'self'; " +
+                            "object-src 'none'; " +
+                            "base-uri 'self'; " +
+                            "form-action 'self'"
+                        )
+                    )
                     .frameOptions(FrameOptionsConfig::sameOrigin)
                     .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                     .permissionsPolicyHeader(permissions ->

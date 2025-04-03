@@ -1,3 +1,4 @@
+// src/main/webapp/app/shared/alert/alert.service.ts
 import type { BvToast } from 'bootstrap-vue';
 import { getCurrentInstance } from 'vue';
 import { type Composer, useI18n } from 'vue-i18n';
@@ -55,36 +56,66 @@ export default class AlertService {
   }
 
   public showHttpError(httpErrorResponse: any) {
-    let errorMessage: string | null = null;
+    let errorMessage: string;
+
+    // Check if httpErrorResponse is defined and has a status property
+    if (!httpErrorResponse || typeof httpErrorResponse !== 'object' || !('status' in httpErrorResponse)) {
+      console.error('Invalid HTTP error response:', httpErrorResponse); // Debug: Log the error response
+      errorMessage = this.i18n.t('error.unknown').toString(); // Fallback error message
+      this.showError(errorMessage);
+      return;
+    }
+
     switch (httpErrorResponse.status) {
       case 0:
         errorMessage = this.i18n.t('error.server.not.reachable').toString();
         break;
 
       case 400: {
-        const arr = Object.keys(httpErrorResponse.headers);
+        const arr = Object.keys(httpErrorResponse.headers || {});
         let entityKey: string | null = null;
+        let appError: string | null = null;
         for (const entry of arr) {
           if (entry.toLowerCase().endsWith('app-error')) {
-            errorMessage = httpErrorResponse.headers[entry];
+            appError = httpErrorResponse.headers[entry];
           } else if (entry.toLowerCase().endsWith('app-params')) {
             entityKey = httpErrorResponse.headers[entry];
           }
         }
-        if (errorMessage && entityKey) {
-          errorMessage = this.i18n.t(errorMessage, { entityName: this.i18n.t(`global.menu.entities.${entityKey}`) }).toString();
-        } else if (!errorMessage) {
+        if (appError && entityKey) {
+          errorMessage = this.i18n.t(appError, { entityName: this.i18n.t(`global.menu.entities.${entityKey}`) }).toString();
+        } else if (appError) {
+          errorMessage = this.i18n.t(appError).toString();
+        } else if (httpErrorResponse.data && httpErrorResponse.data.message) {
           errorMessage = this.i18n.t(httpErrorResponse.data.message).toString();
+        } else {
+          errorMessage = this.i18n.t('error.http.400').toString();
         }
         break;
       }
+
+      case 401:
+        errorMessage = this.i18n.t('error.http.401').toString();
+        break;
+
+      case 403:
+        errorMessage = this.i18n.t('error.http.403').toString();
+        break;
 
       case 404:
         errorMessage = this.i18n.t('error.http.404').toString();
         break;
 
+      case 500:
+        errorMessage = this.i18n.t('error.http.500').toString();
+        break;
+
       default:
-        errorMessage = this.i18n.t(httpErrorResponse.data.message).toString();
+        if (httpErrorResponse.data && httpErrorResponse.data.message) {
+          errorMessage = this.i18n.t(httpErrorResponse.data.message).toString();
+        } else {
+          errorMessage = this.i18n.t('error.http.default', { status: httpErrorResponse.status }).toString();
+        }
     }
     this.showError(errorMessage);
   }
