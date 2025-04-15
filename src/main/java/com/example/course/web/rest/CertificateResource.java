@@ -1,19 +1,26 @@
 package com.example.course.web.rest;
 
 import com.example.course.domain.Certificate;
+import com.example.course.domain.CourseProgress;
 import com.example.course.repository.CertificateRepository;
+import com.example.course.repository.CourseProgressRepository;
+import com.example.course.service.CertificateService;
+import com.example.course.service.UserService;
 import com.example.course.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
@@ -36,8 +43,20 @@ public class CertificateResource {
 
     private final CertificateRepository certificateRepository;
 
-    public CertificateResource(CertificateRepository certificateRepository) {
+    private final CourseProgressRepository courseProgressRepository;
+    private final CertificateService certificateService;
+    private final UserService userService;
+
+    public CertificateResource(
+        CertificateRepository certificateRepository,
+        CourseProgressRepository courseProgressRepository,
+        CertificateService certificateService,
+        UserService userService
+    ) {
         this.certificateRepository = certificateRepository;
+        this.courseProgressRepository = courseProgressRepository;
+        this.certificateService = certificateService;
+        this.userService = userService;
     }
 
     /**
@@ -177,5 +196,36 @@ public class CertificateResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    // Add this endpoint
+    @GetMapping("/courses/{courseId}/certificate")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<byte[]> generateCertificate(@PathVariable Long courseId) {
+        CourseProgress progress = courseProgressRepository
+            .findByStudentIdAndCourseId(
+                userService
+                    .getUserWithAuthorities()
+                    .orElseThrow(() -> new BadRequestAlertException("User not found", ENTITY_NAME, "usernotfound"))
+                    .getId(),
+                courseId
+            )
+            .orElseThrow(() -> new BadRequestAlertException("Progress not found", ENTITY_NAME, "notfound"));
+        byte[] pdf = certificateService.generateCertificate(
+            userService
+                .getUserWithAuthorities()
+                .orElseThrow(() -> new BadRequestAlertException("User not found", ENTITY_NAME, "usernotfound"))
+                .getId(),
+            courseId
+        );
+        Certificate cert = new Certificate();
+        cert.setIssueDate(Instant.now());
+        cert.setCertificateUrl("/api/certificates/" + courseId + "/download"); // Simplified
+        cert.setCourseProgress(progress);
+        certificateRepository.save(cert);
+        return ResponseEntity.ok()
+            .header("Content-Disposition", "attachment; filename=certificate.pdf")
+            .contentType(MediaType.APPLICATION_PDF)
+            .body(pdf);
     }
 }

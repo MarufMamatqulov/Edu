@@ -2,9 +2,18 @@ import axios from 'axios';
 
 import { type ILessonProgress } from '@/shared/model/lesson-progress.model';
 
+import type { ICourseProgress } from '@/shared/model/course.model';
 const baseApiUrl = 'api/lesson-progresses';
 
 export default class LessonProgressService {
+  public getProgress(courseId: string): Promise<ICourseProgress[]> {
+    return axios.get<ICourseProgress[]>(`/api/courses/${courseId}/progress`).then(response => response.data);
+  }
+
+  public markViewed(courseId: number, itemId: number): Promise<void> {
+    return axios.post(`/api/lesson-progress/mark-viewed`, { courseId, itemId });
+  }
+
   public find(id: number): Promise<ILessonProgress> {
     return new Promise<ILessonProgress>((resolve, reject) => {
       axios

@@ -8,11 +8,7 @@ const CertificateDetails = () => import('@/entities/certificate/certificate-deta
 const Course = () => import('@/entities/course/course.vue');
 const CourseUpdate = () => import('@/entities/course/course-update.vue');
 const CourseDetails = () => import('@/entities/course/course-details.vue');
-const CourseItems = () => import('@/entities/course-item/CourseItems.vue'); // Add this
-
-const CourseItem = () => import('@/entities/course-item/course-item.vue');
-const CourseItemUpdate = () => import('@/entities/course-item/course-item-update.vue');
-const CourseItemDetails = () => import('@/entities/course-item/course-item-details.vue');
+const CourseItems = () => import('@/entities/course-item/course-items.vue');
 
 const CourseProgress = () => import('@/entities/course-progress/course-progress.vue');
 const CourseProgressUpdate = () => import('@/entities/course-progress/course-progress-update.vue');
@@ -30,10 +26,28 @@ const TestAttempt = () => import('@/entities/test-attempt/test-attempt.vue');
 const TestAttemptUpdate = () => import('@/entities/test-attempt/test-attempt-update.vue');
 const TestAttemptDetails = () => import('@/entities/test-attempt/test-attempt-details.vue');
 
+const StudentDashboard = () => import('@/entities/student-dashboard.vue');
+
+const Leaderboard = () => import('@/entities/leaderboard.vue');
+
 export default {
   path: '/',
   component: Entities,
   children: [
+    {
+      path: 'leaderboard',
+      name: 'Leaderboard',
+      component: Leaderboard,
+      meta: { authorities: [Authority.USER] },
+    },
+
+    {
+      path: 'student-dashboard',
+      name: 'StudentDashboard',
+      component: StudentDashboard,
+      meta: { authorities: [Authority.USER] },
+    },
+
     {
       path: 'certificate',
       name: 'Certificate',
@@ -83,33 +97,9 @@ export default {
       meta: { authorities: [Authority.USER] },
     },
     {
-      path: 'course/:courseId/items', // Add this route
+      path: 'course/:courseId/items',
       name: 'CourseItems',
       component: CourseItems,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'course-item',
-      name: 'CourseItem',
-      component: CourseItem,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'course-item/new',
-      name: 'CourseItemCreate',
-      component: CourseItemUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'course-item/:courseItemId/edit',
-      name: 'CourseItemEdit',
-      component: CourseItemUpdate,
-      meta: { authorities: [Authority.USER] },
-    },
-    {
-      path: 'course-item/:courseItemId/view',
-      name: 'CourseItemView',
-      component: CourseItemDetails,
       meta: { authorities: [Authority.USER] },
     },
     {
@@ -157,7 +147,7 @@ export default {
     {
       path: 'lesson-progress/:lessonProgressId/view',
       name: 'LessonProgressView',
-      component: LessonProgressDetails,
+      component: CourseProgressDetails,
       meta: { authorities: [Authority.USER] },
     },
     {

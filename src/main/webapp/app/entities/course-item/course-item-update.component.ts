@@ -13,6 +13,34 @@ import { CourseItem, type ICourseItem } from '@/shared/model/course-item.model';
 import { ItemType } from '@/shared/model/enumerations/item-type.model';
 import { ContentType } from '@/shared/model/enumerations/content-type.model';
 
+export class CourseItemUpdateComponent {
+  courseItem: ICourseItem = { title: '', itemType: 'LESSON', contentType: null, content: '' };
+  courseId: number;
+  file: File;
+
+  constructor(
+    private courseItemService: CourseItemService,
+    private activatedRoute: ActivatedRoute,
+  ) {
+    this.courseId = this.activatedRoute.snapshot.paramMap.get('courseId');
+  }
+
+  save(): void {
+    const formData = new FormData();
+    formData.append('title', this.courseItem.title);
+    formData.append('contentType', this.courseItem.contentType);
+    if (this.courseItem.contentType === 'UPLOADED_VIDEO') {
+      formData.append('file', this.file);
+    } else {
+      formData.append('content', this.courseItem.content);
+    }
+    this.courseItemService.createLesson(this.courseId, formData).subscribe(
+      () => alert('Lesson added!'),
+      () => alert('Error adding lesson'),
+    );
+  }
+}
+
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'CourseItemUpdate',

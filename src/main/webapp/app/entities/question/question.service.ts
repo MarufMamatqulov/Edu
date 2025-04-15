@@ -5,25 +5,16 @@ import { type IQuestion } from '@/shared/model/question.model';
 const baseApiUrl = 'api/questions';
 
 export default class QuestionService {
+  public retrieve(params: any): Promise<IQuestion[]> {
+    return axios.get('/api/questions', { params }).then(res => res.data);
+  }
+
   public find(id: number): Promise<IQuestion> {
     return new Promise<IQuestion>((resolve, reject) => {
       axios
         .get(`${baseApiUrl}/${id}`)
         .then(res => {
           resolve(res.data);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  public retrieve(): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      axios
-        .get(baseApiUrl)
-        .then(res => {
-          resolve(res);
         })
         .catch(err => {
           reject(err);

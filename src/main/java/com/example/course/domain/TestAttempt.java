@@ -146,4 +146,8 @@ public class TestAttempt implements Serializable {
             ", attemptDate='" + getAttemptDate() + "'" +
             "}";
     }
+
+    public boolean isPassed() {
+        return passed != null && passed;
+    }
 }

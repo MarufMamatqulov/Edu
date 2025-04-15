@@ -1,0 +1,20 @@
+{
+  "onlineCoursePlatformApp": {
+    "courseItem": {
+      "home": {
+        "title": "Kurs Elementlari",
+        "loading": "Yuklanmoqda...",
+        "notFound": "Kurs elementlari topilmadi."
+      }
+    },
+    "lesson": {
+      "notFound": "Dars topilmadi."
+    }
+  },
+  "entity": {
+    "action": {
+      "start": "Boshlash",
+      "back": "Orqaga"
+    }
+  }
+}

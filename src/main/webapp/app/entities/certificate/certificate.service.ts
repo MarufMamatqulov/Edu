@@ -5,6 +5,9 @@ import { type ICertificate } from '@/shared/model/certificate.model';
 const baseApiUrl = 'api/certificates';
 
 export default class CertificateService {
+  public download(courseId: number): Promise<Blob> {
+    return axios.get(`/api/certificates/download/${courseId}`, { responseType: 'blob' }).then(response => response.data);
+  }
   public find(id: number): Promise<ICertificate> {
     return new Promise<ICertificate>((resolve, reject) => {
       axios

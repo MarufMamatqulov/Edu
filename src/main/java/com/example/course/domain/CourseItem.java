@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.Collection;
 
 /**
  * A CourseItem.
@@ -45,6 +46,9 @@ public class CourseItem implements Serializable {
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "author" }, allowSetters = true)
     private Course course;
+
+    @Column(name = "order_index")
+    private Integer orderIndex;
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -169,5 +173,22 @@ public class CourseItem implements Serializable {
             ", content='" + getContent() + "'" +
             ", passingScore=" + getPassingScore() +
             "}";
+    }
+
+    public void setOrderIndex(int orderIndex) {
+        this.orderIndex = orderIndex;
+    }
+
+    public int getOrderIndex() {
+        return orderIndex;
+    }
+
+    public Collection<Object> getItems() {
+        return null;
+    }
+
+    public void setProgress(double progressPercentage) {
+        // TODO Auto-generated method stub
+
     }
 }

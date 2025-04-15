@@ -1,12 +1,19 @@
 package com.example.course.web.rest;
 
+import com.example.course.domain.CourseItem;
 import com.example.course.domain.LessonProgress;
+import com.example.course.domain.User;
+import com.example.course.repository.CourseItemRepository;
+import com.example.course.repository.CourseItemRepository;
 import com.example.course.repository.LessonProgressRepository;
+import com.example.course.service.CourseProgressService;
+import com.example.course.service.UserService;
 import com.example.course.web.rest.errors.BadRequestAlertException;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -14,6 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import tech.jhipster.web.util.HeaderUtil;
@@ -31,13 +39,26 @@ public class LessonProgressResource {
 
     private static final String ENTITY_NAME = "lessonProgress";
 
+    private final CourseItemRepository courseItemRepository;
+
+    // Update constructor
+    private final LessonProgressRepository lessonProgressRepository;
+    private final CourseProgressService courseProgressService; // Added
+    private final UserService userService; // Added
+
     @Value("${jhipster.clientApp.name}")
     private String applicationName;
 
-    private final LessonProgressRepository lessonProgressRepository;
-
-    public LessonProgressResource(LessonProgressRepository lessonProgressRepository) {
+    public LessonProgressResource(
+        CourseItemRepository courseItemRepository,
+        UserService userService,
+        LessonProgressRepository lessonProgressRepository,
+        CourseProgressService courseProgressService
+    ) {
+        this.courseItemRepository = courseItemRepository;
+        this.userService = userService;
         this.lessonProgressRepository = lessonProgressRepository;
+        this.courseProgressService = courseProgressService;
     }
 
     /**
@@ -58,6 +79,21 @@ public class LessonProgressResource {
         return ResponseEntity.created(new URI("/api/lesson-progresses/" + lessonProgress.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, lessonProgress.getId().toString()))
             .body(lessonProgress);
+    }
+
+    @GetMapping("/lesson-progress")
+    public ResponseEntity<LessonProgress> getLessonProgressByCourseItemId(@RequestParam("courseItemId") Long courseItemId) {
+        LOG.debug("REST request to get LessonProgress by courseItemId : {}", courseItemId);
+        LessonProgress progress = lessonProgressRepository
+            .findByStudentIdAndCourseItemId(
+                userService
+                    .getUserWithAuthorities()
+                    .orElseThrow(() -> new BadRequestAlertException("User not found", ENTITY_NAME, "usernotfound"))
+                    .getId(),
+                courseItemId
+            )
+            .orElse(null);
+        return ResponseUtil.wrapOrNotFound(Optional.ofNullable(progress));
     }
 
     /**
@@ -185,5 +221,39 @@ public class LessonProgressResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    // Add this endpoint
+    @PostMapping("/courses/{courseId}/items/{itemId}/view")
+    @PreAuthorize("hasAuthority('ROLE_USER')")
+    public ResponseEntity<Void> markLessonViewed(@PathVariable Long courseId, @PathVariable Long itemId) {
+        CourseItem item = courseItemRepository
+            .findById(itemId)
+            .orElseThrow(() -> new BadRequestAlertException("Item not found", ENTITY_NAME, "notfound"));
+        if (!item.getCourse().getId().equals(courseId)) {
+            throw new BadRequestAlertException("Item does not belong to course", ENTITY_NAME, "invalidcourse");
+        }
+        LessonProgress progress = lessonProgressRepository
+            .findByStudentIdAndCourseItemId(
+                userService
+                    .getUserWithAuthorities()
+                    .orElseThrow(() -> new BadRequestAlertException("User not found", ENTITY_NAME, "usernotfound"))
+                    .getId(),
+                itemId
+            )
+            .orElse(new LessonProgress());
+        User currentUser = userService.getUserWithAuthorities().get();
+        progress.setStudent(currentUser);
+        progress.setCourseItem(item);
+        progress.setViewed(true);
+        progress.setViewedDate(Instant.now());
+        lessonProgressRepository.save(progress);
+
+        // Ball qo'shish
+        currentUser.setPoints(currentUser.getPoints() + 10); // Har bir dars uchun 10 ball
+        userService.updateUser(currentUser);
+
+        courseProgressService.updateCourseProgress(courseId, currentUser.getId());
+        return ResponseEntity.noContent().build();
     }
 }

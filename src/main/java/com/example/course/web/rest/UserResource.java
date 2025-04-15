@@ -205,4 +205,11 @@ public class UserResource {
         userService.deleteUser(login);
         return ResponseEntity.noContent().headers(HeaderUtil.createAlert(applicationName, "userManagement.deleted", login)).build();
     }
+
+    @GetMapping("/leaderboard")
+    public ResponseEntity<List<User>> getLeaderboard() {
+        LOG.debug("REST request to get leaderboard");
+        List<User> users = userRepository.findAll(Sort.by(Sort.Direction.DESC, "points"));
+        return ResponseEntity.ok(users);
+    }
 }

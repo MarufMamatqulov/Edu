@@ -10,6 +10,37 @@ import { useAlertService } from '@/shared/alert/alert.service';
 import UserService from '@/entities/user/user.service';
 import { Course, type ICourse } from '@/shared/model/course.model';
 
+export class CourseUpdateComponent {
+  course: ICourse = { title: '', description: '' };
+  isSaving = false;
+
+  constructor(
+    private courseService: CourseService,
+    private accountService: AccountService,
+    private router: Router,
+  ) {}
+
+  ngOnInit(): void {
+    this.accountService.identity().subscribe(account => {
+      if (!account || !this.accountService.hasAnyAuthority('ROLE_ADMIN')) {
+        this.router.navigate(['/accessdenied']);
+      }
+    });
+  }
+
+  save(): void {
+    this.isSaving = true;
+    this.courseService.create(this.course).subscribe(
+      () => {
+        this.isSaving = false;
+        this.router.navigate(['/course']);
+        alert('Course created successfully!');
+      },
+      () => (this.isSaving = false),
+    );
+  }
+}
+
 export default defineComponent({
   compatConfig: { MODE: 3 },
   name: 'CourseUpdate',

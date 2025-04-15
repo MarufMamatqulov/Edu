@@ -20,6 +20,8 @@ import '../content/scss/vendor.scss';
 import TranslationService from '@/locale/translation.service';
 
 import '@fortawesome/fontawesome-free/css/all.min.css';
+import axios from 'axios';
+axios.defaults.baseURL = 'http://localhost:7777';
 
 const pinia = createPinia();
 

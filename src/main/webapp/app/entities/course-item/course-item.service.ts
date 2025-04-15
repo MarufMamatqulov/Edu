@@ -5,17 +5,12 @@ import type { ICourseItem } from '@/shared/model/course-item.model';
 const baseApiUrl = 'api/course-items';
 
 export default class CourseItemService {
-  public find(id: number): Promise<ICourseItem> {
-    return new Promise<ICourseItem>((resolve, reject) => {
-      axios
-        .get(`${baseApiUrl}/${id}`)
-        .then(res => {
-          resolve(res.data);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+  public find(id: string | number): Promise<ICourseItem> {
+    return axios.get(`/api/course-items/${id}`).then(res => res.data);
+  }
+
+  public findAllByCourse(courseId: number): Promise<ICourseItem[]> {
+    return axios.get<ICourseItem[]>(`api/courses/${courseId}/items`).then(response => response.data);
   }
 
   public retrieve(): Promise<any> {
@@ -81,6 +76,10 @@ export default class CourseItemService {
           reject(err);
         });
     });
+  }
+
+  public addLesson(courseId: string | number, formData: FormData): Promise<ICourseItem> {
+    return axios.post(`/api/courses/${courseId}/lessons`, formData).then(res => res.data);
   }
 
   public uploadLesson(courseId: number, formData: FormData): Promise<ICourseItem> {

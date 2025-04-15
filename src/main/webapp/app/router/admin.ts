@@ -1,5 +1,6 @@
 import { Authority } from '@/shared/security/authority';
 
+const AdminDashboard = () => import('@/admin/admin-dashboard.vue');
 const JhiUserManagementComponent = () => import('@/admin/user-management/user-management.vue');
 const JhiUserManagementViewComponent = () => import('@/admin/user-management/user-management-view.vue');
 const JhiUserManagementEditComponent = () => import('@/admin/user-management/user-management-edit.vue');
@@ -10,6 +11,13 @@ const JhiLogsComponent = () => import('@/admin/logs/logs.vue');
 const JhiMetricsComponent = () => import('@/admin/metrics/metrics.vue');
 
 export default [
+  {
+    path: '/admin/dashboard',
+    name: 'AdminDashboard',
+    component: AdminDashboard,
+    meta: { authorities: [Authority.ADMIN] },
+  },
+
   {
     path: '/admin/user-management',
     name: 'JhiUser',

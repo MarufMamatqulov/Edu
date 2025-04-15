@@ -1,85 +1,28 @@
 import axios from 'axios';
-
-import { type ICourse } from '@/shared/model/course.model';
-
-const baseApiUrl = 'api/courses';
+import type { ICourse } from '@/shared/model/course.model'; // Use type-only import
 
 export default class CourseService {
+  public findAll(): Promise<ICourse[]> {
+    return axios.get<ICourse[]>('api/courses').then(response => response.data);
+  }
+
   public find(id: number): Promise<ICourse> {
-    return new Promise<ICourse>((resolve, reject) => {
-      axios
-        .get(`${baseApiUrl}/${id}`)
-        .then(res => {
-          resolve(res.data);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+    return axios.get<ICourse>(`api/courses/${id}`).then(response => response.data);
   }
 
   public retrieve(): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      axios
-        .get(baseApiUrl)
-        .then(res => {
-          resolve(res);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+    return axios.get('api/courses');
   }
 
-  public delete(id: number): Promise<any> {
-    return new Promise<any>((resolve, reject) => {
-      axios
-        .delete(`${baseApiUrl}/${id}`)
-        .then(res => {
-          resolve(res);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+  public create(course: ICourse): Promise<ICourse> {
+    return axios.post<ICourse>('api/courses', course).then(response => response.data);
   }
 
-  public create(entity: ICourse): Promise<ICourse> {
-    return new Promise<ICourse>((resolve, reject) => {
-      axios
-        .post(`${baseApiUrl}`, entity)
-        .then(res => {
-          resolve(res.data);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+  public getItems(courseId: string): Promise<any> {
+    return axios.get(`/api/courses/${courseId}/items`).then(response => response.data);
   }
 
-  public update(entity: ICourse): Promise<ICourse> {
-    return new Promise<ICourse>((resolve, reject) => {
-      axios
-        .put(`${baseApiUrl}/${entity.id}`, entity)
-        .then(res => {
-          resolve(res.data);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
-  }
-
-  public partialUpdate(entity: ICourse): Promise<ICourse> {
-    return new Promise<ICourse>((resolve, reject) => {
-      axios
-        .patch(`${baseApiUrl}/${entity.id}`, entity)
-        .then(res => {
-          resolve(res.data);
-        })
-        .catch(err => {
-          reject(err);
-        });
-    });
+  public getProgress(courseId: string): Promise<any> {
+    return axios.get(`/api/courses/${courseId}/progress`).then(response => response.data);
   }
 }

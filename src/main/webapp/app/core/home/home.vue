@@ -1,7 +1,6 @@
 <!-- src/main/webapp/app/core/home/home.vue -->
 <template>
   <div class="home-container">
-    <!-- Header Section -->
     <div class="row">
       <div class="col-md-12 text-center">
         <h1 class="display-4" v-text="t$('home.title')"></h1>
@@ -9,28 +8,48 @@
       </div>
     </div>
 
-    <!-- Loading State -->
+    <!-- Qidiruv va Filtr -->
+    <div class="search-filter-section mb-4">
+      <div class="row">
+        <div class="col-md-6">
+          <input v-model="searchQuery" placeholder="Kurslarni qidirish..." class="form-control" @input="filterCourses" />
+        </div>
+        <div class="col-md-3">
+          <select v-model="filterCategory" class="form-control" @change="filterCourses">
+            <option value="">Barcha Kategoriyalar</option>
+            <option value="IT">IT</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Dizayn">Dizayn</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <select v-model="filterPrice" class="form-control" @change="filterCourses">
+            <option value="">Barcha Narxlar</option>
+            <option value="free">Bepul</option>
+            <option value="paid">Pullik</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
     <div v-if="loading" class="text-center">
       <p>Loading courses...</p>
     </div>
 
-    <!-- Course List -->
     <div v-else class="course-card-list">
       <div
-        v-for="course in courses"
+        v-for="course in filteredCourses"
         :key="course.id"
         class="course-card"
         v-bind="course as { id: number; title: string; description: string; price: number; imageUrl: string | null }"
       >
-        <img v-if="course.imageUrl" :src="course.imageUrl" class="course-image" alt="Course Image" />
+        <img v-if="course.imageUrl" :src="course.imageUrl" class="course-image" :alt="course.title" />
         <div class="course-body">
           <h3 class="course-title">{{ course.title }}</h3>
           <p class="course-description">{{ course.description }}</p>
           <p class="course-price">
             {{ course.price && course.price > 0 ? course.price + ' so‘m' : 'Bepul' }}
           </p>
-
-          <!-- Course Items (YouTube Videos) -->
           <div v-if="course.items && course.items.length > 0" class="course-items">
             <h4>YouTube Videolar</h4>
             <div v-for="item in course.items.filter(item => item.contentType === 'YOUTUBE_VIDEO')" :key="item.id" class="course-item">
@@ -54,31 +73,49 @@
         </div>
         <button class="course-start-button" @click="goToCourseItems(course.id)">Boshlash</button>
       </div>
-
-      <!-- Fallback if no courses -->
-      <p v-if="!courses.length" class="text-center no-courses">No courses available at the moment.</p>
+      <p v-if="!filteredCourses.length" class="text-center no-courses">No courses available at the moment.</p>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, onMounted, ref } from 'vue';
+import { defineComponent, onMounted, ref, computed, onUnmounted } from 'vue';
+import { useRouter } from 'vue-router';
 import CourseService from '@/entities/course/course.service';
 import axios from 'axios';
+import { Client, Stomp } from '@stomp/stompjs';
+import SockJS from 'sockjs-client';
 
 export default defineComponent({
   name: 'Home',
   setup() {
+    const router = useRouter();
     const courses = ref<any[]>([]);
+    const filteredCourses = ref<any[]>([]);
     const loading = ref(true);
     const courseService = new CourseService();
+    const searchQuery = ref('');
+    const filterCategory = ref('');
+    const filterPrice = ref('');
+    let stompClient: Client | null = null;
 
-    onMounted(async () => {
+    const connectWebSocket = () => {
+      const socket = new SockJS('http://localhost:7777/ws');
+      stompClient = Stomp.over(socket);
+      stompClient.connect({}, () => {
+        stompClient?.subscribe('/topic/notifications', message => {
+          if (message.body) {
+            alert(message.body);
+            fetchCourses(); // Yangi kurs qo‘shilganda ro‘yxatni yangilash
+          }
+        });
+      });
+    };
+
+    const fetchCourses = async () => {
+      loading.value = true;
       try {
         const response = await courseService.retrieve();
-        console.log('API Response:', response);
-        console.log('API Response Data:', response.data);
-
         let fetchedCourses = [];
         if (Array.isArray(response.data)) {
           fetchedCourses = response.data;
@@ -87,14 +124,12 @@ export default defineComponent({
         } else {
           console.warn('Unexpected API response structure:', response.data);
         }
-
         const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
         if (!token) {
           console.error('No JWT token found. Please log in.');
           loading.value = false;
           return;
         }
-
         for (const course of fetchedCourses) {
           try {
             const itemsResponse = await axios.get(`/api/courses/${course.id}/items`, {
@@ -102,14 +137,13 @@ export default defineComponent({
                 Authorization: `Bearer ${token}`,
               },
             });
-            console.log(`Items for course ${course.id}:`, itemsResponse.data);
             course.items = itemsResponse.data;
+            course.category = course.category || 'IT';
           } catch (error) {
             console.error(`Error fetching items for course ${course.id}:`, error);
             course.items = [];
           }
         }
-
         courses.value = fetchedCourses.map(course => ({
           id: course.id,
           title: course.title || course.name || 'Untitled Course',
@@ -117,18 +151,27 @@ export default defineComponent({
           price: course.price || 0,
           imageUrl: course.imageUrl || course.image || null,
           items: course.items || [],
+          category: course.category || 'IT',
         }));
-
-        console.log('Mapped Courses with Items:', courses.value);
+        filteredCourses.value = courses.value;
       } catch (error) {
         console.error('Error fetching courses:', error);
       } finally {
         loading.value = false;
       }
-    });
+    };
+
+    const filterCourses = () => {
+      filteredCourses.value = courses.value.filter(course => {
+        const matchesSearch = course.title.toLowerCase().includes(searchQuery.value.toLowerCase());
+        const matchesCategory = filterCategory.value ? course.category === filterCategory.value : true;
+        const matchesPrice = filterPrice.value ? (filterPrice.value === 'free' ? course.price === 0 : course.price > 0) : true;
+        return matchesSearch && matchesCategory && matchesPrice;
+      });
+    };
 
     const goToCourseItems = (courseId: number) => {
-      (window as any).location.href = `/course/${courseId}/items`;
+      router.push(`/course/${courseId}/items`);
     };
 
     const getYouTubeEmbedUrl = (url: string): string => {
@@ -146,9 +189,25 @@ export default defineComponent({
       }
     };
 
+    onMounted(() => {
+      fetchCourses();
+      connectWebSocket();
+    });
+
+    onUnmounted(() => {
+      if (stompClient) {
+        stompClient.disconnect();
+      }
+    });
+
     return {
       courses,
+      filteredCourses,
       loading,
+      searchQuery,
+      filterCategory,
+      filterPrice,
+      filterCourses,
       goToCourseItems,
       getYouTubeEmbedUrl,
       t$: (key: string) => key,

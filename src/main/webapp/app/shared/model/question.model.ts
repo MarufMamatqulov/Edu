@@ -1,20 +1,17 @@
-import { type ICourseItem } from '@/shared/model/course-item.model';
-
-import { type QuestionType } from '@/shared/model/enumerations/question-type.model';
 export interface IQuestion {
   id?: number;
   text?: string;
-  type?: keyof typeof QuestionType;
+  type?: string;
   options?: string;
-  courseItem?: ICourseItem | null;
+  courseItem?: any;
 }
 
 export class Question implements IQuestion {
   constructor(
     public id?: number,
     public text?: string,
-    public type?: keyof typeof QuestionType,
+    public type?: string,
     public options?: string,
-    public courseItem?: ICourseItem | null,
+    public courseItem?: any,
   ) {}
 }

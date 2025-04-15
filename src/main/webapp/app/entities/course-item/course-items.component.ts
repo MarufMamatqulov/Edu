@@ -3,6 +3,7 @@ import { useRoute, useRouter } from 'vue-router';
 import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import { useAlertService } from '@/shared/alert/alert.service';
+import { CourseItem, type ICourseItem } from '@/shared/model/course-item.model';
 
 export default defineComponent({
   name: 'CourseItems',

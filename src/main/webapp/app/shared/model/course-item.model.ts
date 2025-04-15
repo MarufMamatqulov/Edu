@@ -2,24 +2,29 @@ import { type ICourse } from '@/shared/model/course.model';
 
 import { type ItemType } from '@/shared/model/enumerations/item-type.model';
 import { type ContentType } from '@/shared/model/enumerations/content-type.model';
+
 export interface ICourseItem {
   id?: number;
   title?: string;
-  itemType?: keyof typeof ItemType;
-  contentType?: keyof typeof ContentType | null;
-  content?: string | null;
-  passingScore?: number | null;
-  course?: ICourse | null;
+  itemType?: string;
+  contentType?: string;
+  content?: string;
+  passingScore?: number;
+  course?: any;
+  orderIndex?: number;
+  items?: any;
 }
 
 export class CourseItem implements ICourseItem {
   constructor(
     public id?: number,
     public title?: string,
-    public itemType?: keyof typeof ItemType,
-    public contentType?: keyof typeof ContentType | null,
-    public content?: string | null,
-    public passingScore?: number | null,
-    public course?: ICourse | null,
+    public itemType?: string,
+    public contentType?: string,
+    public content?: string,
+    public passingScore?: number,
+    public course?: any,
+    public orderIndex?: number,
+    public items?: any,
   ) {}
 }

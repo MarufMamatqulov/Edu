@@ -52,6 +52,7 @@ public class SecurityConfiguration {
                             "connect-src 'self' http://localhost:7777 ws://localhost:7777; " +
                             "script-src 'self' 'unsafe-eval'; " +
                             "style-src 'self' 'unsafe-inline'; " +
+                            "frame-src 'self' https://www.youtube.com; " +
                             "img-src 'self' data:; " +
                             "font-src 'self'; " +
                             "frame-src 'self'; " +

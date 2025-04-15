@@ -1,10 +1,29 @@
-import { type IUser } from '@/shared/model/user.model';
+import type { IUser } from '@/shared/model/user.model.ts';
 
 export interface ICourse {
   id?: number;
   title?: string;
-  description?: string | null;
-  author?: IUser | null;
+  description?: string;
+  author?: any;
+}
+
+export interface ICourseItem {
+  id?: number;
+  title?: string;
+  itemType?: string;
+  contentType?: string;
+  content?: string;
+  passingScore?: number;
+  course?: ICourse;
+  orderIndex?: number;
+}
+
+export interface ICourseProgress {
+  id?: number;
+  completedItems?: number;
+  isCompleted?: boolean;
+  student?: any;
+  course?: ICourse;
 }
 
 export class Course implements ICourse {

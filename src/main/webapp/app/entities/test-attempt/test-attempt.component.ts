@@ -5,6 +5,26 @@ import TestAttemptService from './test-attempt.service';
 import { type ITestAttempt } from '@/shared/model/test-attempt.model';
 import { useDateFormat } from '@/shared/composables';
 import { useAlertService } from '@/shared/alert/alert.service';
+import type { ActivatedRoute } from '@angular/router';
+
+export class TestAttemptComponent {
+  courseItemId: number;
+  answers: { [key: number]: string[] } = {};
+
+  constructor(
+    private testAttemptService: TestAttemptService,
+    private activatedRoute: ActivatedRoute,
+  ) {
+    this.courseItemId = Number(this.activatedRoute.snapshot.paramMap.get('courseItemId'));
+  }
+
+  submit(): void {
+    this.testAttemptService.submitTest(this.courseItemId, this.answers).subscribe(
+      result => alert(`Score: ${result.score}%, Passed: ${result.passed}`),
+      () => alert('Error submitting test'),
+    );
+  }
+}
 
 export default defineComponent({
   compatConfig: { MODE: 3 },

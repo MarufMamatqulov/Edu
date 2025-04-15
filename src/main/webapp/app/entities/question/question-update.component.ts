@@ -9,8 +9,9 @@ import { useAlertService } from '@/shared/alert/alert.service';
 
 import CourseItemService from '@/entities/course-item/course-item.service';
 import { type ICourseItem } from '@/shared/model/course-item.model';
-import { type IQuestion, Question } from '@/shared/model/question.model';
+
 import { QuestionType } from '@/shared/model/enumerations/question-type.model';
+import { type IQuestion, Question } from '@/shared/model/question.model';
 
 export default defineComponent({
   compatConfig: { MODE: 3 },

@@ -1,41 +1,67 @@
 <template>
-  <div class="row justify-content-center">
-    <div class="col-8">
-      <div v-if="course">
-        <h2 class="jh-entity-heading" data-cy="courseDetailsHeading">
-          <span v-text="t$('onlineCoursePlatformApp.course.detail.title')"></span> {{ course.id }}
-        </h2>
-        <dl class="row jh-entity-details">
-          <dt>
-            <span v-text="t$('onlineCoursePlatformApp.course.title')"></span>
-          </dt>
-          <dd>
-            <span>{{ course.title }}</span>
-          </dd>
-          <dt>
-            <span v-text="t$('onlineCoursePlatformApp.course.description')"></span>
-          </dt>
-          <dd>
-            <span>{{ course.description }}</span>
-          </dd>
-          <dt>
-            <span v-text="t$('onlineCoursePlatformApp.course.author')"></span>
-          </dt>
-          <dd>
-            {{ course.author ? course.author.username : '' }}
-          </dd>
-        </dl>
-        <button type="submit" @click.prevent="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
-          <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.back')"></span>
-        </button>
-        <router-link v-if="course.id" :to="{ name: 'CourseEdit', params: { courseId: course.id } }" custom v-slot="{ navigate }">
-          <button @click="navigate" class="btn btn-primary">
-            <font-awesome-icon icon="pencil-alt"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.edit')"></span>
-          </button>
-        </router-link>
-      </div>
-    </div>
+  <div>
+    <h2>{{ course.title }}</h2>
+    <p>Progress: {{ progress?.completedItems }} / {{ courseItems.length }} ({{ progressPercentage }}%)</p>
+    <ul>
+      <li v-for="item in courseItems" :key="item.id">
+        {{ item.title }} ({{ item.itemType }})
+        <button v-if="item.itemType === 'LESSON' && !isCompleted(item)" @click="markViewed(item.id)">Mark Viewed</button>
+        <router-link v-if="item.itemType === 'TEST'" :to="`/entity/test-attempt/${item.id}`">Take Test</router-link>
+      </li>
+    </ul>
+    <button v-if="progress?.isCompleted" @click="downloadCertificate">Download Certificate</button>
   </div>
 </template>
 
-<script lang="ts" src="./course-details.component.ts"></script>
+<script lang="ts">
+import { defineComponent } from 'vue';
+import CourseService from '@/entities/course/course.service';
+import LessonProgressService from '@/entities/lesson-progress/lesson-progress.service';
+import CertificateService from '@/entities/certificate/certificate.service';
+import { ICourse, ICourseItem, ICourseProgress } from '@/shared/model/course.model';
+
+export default defineComponent({
+  name: 'CourseDetail',
+  data() {
+    return {
+      course: {} as ICourse,
+      courseItems: [] as ICourseItem[],
+      progress: null as ICourseProgress | null,
+    };
+  },
+  created() {
+    this.loadCourse();
+  },
+  computed: {
+    progressPercentage() {
+      return this.progress ? Math.round((this.progress.completedItems / this.courseItems.length) * 100) : 0;
+    },
+  },
+  methods: {
+    async loadCourse() {
+      const courseId = this.$route.params.id as string;
+      this.course = await CourseService.find(courseId);
+      this.courseItems = await CourseService.getItems(courseId);
+      const progressData = await CourseService.getProgress(courseId);
+      this.progress = progressData.length > 0 ? progressData[0] : null;
+    },
+    async markViewed(itemId: number) {
+      await LessonProgressService.markViewed(this.course.id, itemId);
+      this.loadCourse();
+      this.$toast.success('Lesson marked as viewed');
+    },
+    isCompleted(item: ICourseItem) {
+      return this.progress && this.progress.completedItems > this.courseItems.indexOf(item);
+    },
+    async downloadCertificate() {
+      const blob = await CertificateService.download(this.course.id);
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'certificate.pdf';
+      link.click();
+    },
+  },
+  inject: ['$toast'],
+});
+</script>

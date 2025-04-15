@@ -27,6 +27,9 @@ public class Course implements Serializable {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "category")
+    private String category;
+
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
 
@@ -43,6 +46,14 @@ public class Course implements Serializable {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public String getTitle() {

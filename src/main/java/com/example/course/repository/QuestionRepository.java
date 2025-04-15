@@ -37,4 +37,6 @@ public interface QuestionRepository extends JpaRepository<Question, Long> {
 
     @Query("select question from Question question left join fetch question.courseItem where question.id =:id")
     Optional<Question> findOneWithToOneRelationships(@Param("id") Long id);
+
+    List<Question> findByCourseItemId(Long courseItemId);
 }

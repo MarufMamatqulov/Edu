@@ -293,4 +293,18 @@ public class UserService {
     public List<String> getAuthorities() {
         return authorityRepository.findAll().stream().map(Authority::getName).toList();
     }
+
+    public void updateUser(User currentUser) {
+        userRepository
+            .findOneByLogin(currentUser.getLogin())
+            .ifPresent(user -> {
+                user.setFirstName(currentUser.getFirstName());
+                user.setLastName(currentUser.getLastName());
+                user.setEmail(currentUser.getEmail());
+                user.setLangKey(currentUser.getLangKey());
+                user.setImageUrl(currentUser.getImageUrl());
+                userRepository.save(user);
+                LOG.debug("Changed Information for User: {}", user);
+            });
+    }
 }

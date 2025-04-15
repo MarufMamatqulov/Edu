@@ -7,102 +7,39 @@
                         http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
     <changeSet id="00000000000000" author="jhipster">
-        <createSequence sequenceName="sequence_generator" startValue="1050" incrementBy="50"/>
+      <loadData tableName="jhi_user" file="config/liquibase/data/jhi_user.csv" separator=";" />
     </changeSet>
 
     <!--
         JHipster core tables.
         The initial schema has the '00000000000001' id, so that it is over-written if we re-generate it.
     -->
-    <changeSet id="00000000000001" author="jhipster">
-        <createTable tableName="jhi_user">
-            <column name="id" type="bigint">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-            <column name="login" type="varchar(50)">
-                <constraints unique="true" nullable="false" uniqueConstraintName="ux_user_login"/>
-            </column>
-            <column name="password_hash" type="varchar(60)"/>
-            <column name="first_name" type="varchar(50)"/>
-            <column name="last_name" type="varchar(50)"/>
-            <column name="email" type="varchar(191)">
-                <constraints unique="true" nullable="true" uniqueConstraintName="ux_user_email"/>
-            </column>
-            <column name="image_url" type="varchar(256)"/>
-            <column name="activated" type="boolean" valueBoolean="false">
-                <constraints nullable="false" />
-            </column>
-            <column name="lang_key" type="varchar(10)"/>
-            <column name="activation_key" type="varchar(20)"/>
-            <column name="reset_key" type="varchar(20)"/>
-            <column name="created_by" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-            <column name="created_date" type="timestamp"/>
-            <column name="reset_date" type="timestamp">
-                <constraints nullable="true"/>
-            </column>
-            <column name="last_modified_by" type="varchar(50)"/>
-            <column name="last_modified_date" type="timestamp"/>
-        </createTable>
-
-        <createTable tableName="jhi_authority">
-            <column name="name" type="varchar(50)">
-                <constraints primaryKey="true" nullable="false"/>
-            </column>
-        </createTable>
-
-        <createTable tableName="jhi_user_authority">
-            <column name="user_id" type="bigint">
-                <constraints nullable="false"/>
-            </column>
-            <column name="authority_name" type="varchar(50)">
-                <constraints nullable="false"/>
-            </column>
-        </createTable>
-
-        <addPrimaryKey columnNames="user_id, authority_name" tableName="jhi_user_authority"/>
-
-        <addForeignKeyConstraint baseColumnNames="authority_name"
-                                 baseTableName="jhi_user_authority"
-                                 constraintName="fk_authority_name"
-                                 referencedColumnNames="name"
-                                 referencedTableName="jhi_authority"/>
-
-        <addForeignKeyConstraint baseColumnNames="user_id"
-                                 baseTableName="jhi_user_authority"
-                                 constraintName="fk_user_id"
-                                 referencedColumnNames="id"
-                                 referencedTableName="jhi_user"/>
-
-        <addNotNullConstraint   columnName="password_hash"
-                                columnDataType="varchar(60)"
-                                tableName="jhi_user"/>
-        <loadData
-                  file="config/liquibase/data/authority.csv"
-                  separator=";"
-                  tableName="jhi_authority"
-                  usePreparedStatements="true">
-            <column name="name" type="string"/>
-        </loadData>
-        <loadData
-                  file="config/liquibase/data/user.csv"
-                  separator=";"
-                  tableName="jhi_user"
-                  usePreparedStatements="true">
-            <column name="id" type="numeric"/>
-            <column name="activated" type="boolean"/>
-            <column name="created_date" type="timestamp"/>
-        </loadData>
-        <loadData
-                  file="config/liquibase/data/user_authority.csv"
-                  separator=";"
-                  tableName="jhi_user_authority"
-                  usePreparedStatements="true">
-            <column name="user_id" type="numeric"/>
-        </loadData>
-        <dropDefaultValue tableName="jhi_user" columnName="created_date" columnDataType="${datetimeType}"/>
-    </changeSet>
+  <changeSet id="00000000000000-1" author="jhipster">
+    <insert tableName="jhi_user">
+      <column name="id" valueNumeric="1"/>
+      <column name="login" value="system"/>
+      <column name="password_hash" value="$2a$10$mE.qAA.0ShwLrxWqsj1KEO8x3sW4XgB0zU9tUH1zX9y0v2gq2f5S"/>
+      <column name="first_name" value="System"/>
+      <column name="last_name" value="System"/>
+      <column name="email" value="system@localhost"/>
+      <column name="activated" valueBoolean="true"/>
+      <column name="lang_key" value="en"/>
+      <column name="created_by" value="system"/>
+      <column name="created_date" valueDate="2025-04-15T00:00:00Z"/>
+    </insert>
+    <insert tableName="jhi_user">
+      <column name="id" valueNumeric="2"/>
+      <column name="login" value="admin"/>
+      <column name="password_hash" value="$2a$10$gSAhZrxMllrbgj/kkK9UceBPpChFF5QCiHFMWP8S5jYdI9K5r9AZ"/>
+      <column name="first_name" value="Administrator"/>
+      <column name="last_name" value="Administrator"/>
+      <column name="email" value="admin@localhost"/>
+      <column name="activated" valueBoolean="true"/>
+      <column name="lang_key" value="en"/>
+      <column name="created_by" value="system"/>
+      <column name="created_date" valueDate="2025-04-15T00:00:00Z"/>
+    </insert>
+  </changeSet>
 
     <changeSet author="jhipster" id="00000000000002" context="test">
         <createTable tableName="jhi_date_time_wrapper">

@@ -42,4 +42,6 @@ public interface TestAttemptRepository extends JpaRepository<TestAttempt, Long> 
         "select testAttempt from TestAttempt testAttempt left join fetch testAttempt.student left join fetch testAttempt.courseItem where testAttempt.id =:id"
     )
     Optional<TestAttempt> findOneWithToOneRelationships(@Param("id") Long id);
+
+    Optional<Object> findByStudentIdAndCourseItemIdAndPassed(Long userId, Long id, boolean b);
 }
