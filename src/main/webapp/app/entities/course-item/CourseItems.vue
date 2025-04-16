@@ -45,18 +45,20 @@
   </div>
 </template>
 
+<!-- src/main/webapp/app/entities/course-item/course-items.vue -->
 <script lang="ts">
-import { defineComponent, ref, onMounted } from 'vue';
+import { defineComponent, ref, onMounted, computed, getCurrentInstance } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import axios from 'axios';
 import { useI18n } from 'vue-i18n';
 import { useAlertService } from '@/shared/alert/alert.service';
+import axios from '@/shared/config/axios';
 
 export default defineComponent({
   name: 'CourseItems',
   setup() {
-    console.log('CourseItems setup started'); // Debug: Confirm setup is called
     const { t: t$ } = useI18n();
+    const instance = getCurrentInstance();
+    const i18n = instance?.proxy?.$i18n;
     const route = useRoute();
     const router = useRouter();
     const alertService = useAlertService();
@@ -64,44 +66,70 @@ export default defineComponent({
     const isFetching = ref(false);
     const courseId = ref(route.params.courseId);
 
-    console.log('Course ID from route:', courseId.value); // Debug: Log the courseId
-
     const retrieveCourseItems = async () => {
-      console.log('retrieveCourseItems called'); // Debug: Confirm function is called
       isFetching.value = true;
       try {
         console.log('Fetching course items for courseId:', courseId.value);
         const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
-        console.log('JWT Token:', token);
+        console.log('JWT Token:', token || 'No token found'); // Debug: Log token presence
         if (!token) {
-          throw new Error('No JWT token found in localStorage or sessionStorage');
+          console.error('No JWT token found, redirecting to login...');
+          router.push('/login');
+          return;
         }
         const res = await axios.get(`/api/courses/${courseId.value}/items`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-        console.log('Course items response:', res);
-        items.value = res.data;
-        console.log('Items set to:', items.value);
+        console.log('Response data:', res.data);
+        if (!Array.isArray(res.data)) {
+          console.error('Response data is not an array:', res.data);
+          items.value = [];
+        } else {
+          items.value = res.data;
+        }
       } catch (err) {
         console.error('Error fetching course items:', err);
-        console.error('Error response:', err.response);
-        alertService.showHttpError(err.response);
+        if (err.response) {
+          console.error('Error response status:', err.response.status);
+          console.error('Error response data:', err.response.data);
+          if (err.response.status === 401 || err.response.status === 403) {
+            console.error('Unauthorized or Forbidden, redirecting to login...');
+            localStorage.removeItem('jhi-authenticationToken');
+            sessionStorage.removeItem('jhi-authenticationToken');
+            router.push('/login');
+            return;
+          }
+          alertService.showHttpError(err.response);
+        } else {
+          alertService.showError(t$('error.noResponse', { message: 'No response from server' }));
+        }
       } finally {
         isFetching.value = false;
       }
     };
 
+    const sortedItems = computed(() => {
+      if (!Array.isArray(items.value)) return [];
+      return [...items.value].sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+    });
+
     const startItem = (item: any) => {
-      console.log('Starting item:', item);
-      console.log('Course ID:', courseId.value);
       if (item.itemType === 'LESSON') {
-        console.log('Navigating to lesson:', `/course/${courseId.value}/lesson/${item.id}`);
         router.push(`/course/${courseId.value}/lesson/${item.id}`);
       } else if (item.itemType === 'TEST') {
-        console.log('Navigating to test:', `/course/${courseId.value}/test/${item.id}`);
         router.push(`/course/${courseId.value}/test/${item.id}`);
+      }
+    };
+
+    const getYouTubeThumbnail = (url: string): string => {
+      try {
+        const videoIdMatch = url.match(/(?:v=)([^&]+)/) || url.match(/(?:youtu\.be\/)([^?]+)/);
+        const videoId = videoIdMatch ? videoIdMatch[1] : null;
+        if (!videoId) return '';
+        return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+      } catch (error) {
+        console.error('Error parsing YouTube URL for thumbnail:', error);
+        return '';
       }
     };
 
@@ -112,8 +140,10 @@ export default defineComponent({
 
     return {
       items,
+      sortedItems,
       isFetching,
       startItem,
+      getYouTubeThumbnail,
       t$,
     };
   },

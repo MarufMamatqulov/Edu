@@ -44,4 +44,6 @@ public interface LessonProgressRepository extends JpaRepository<LessonProgress, 
         "select lessonProgress from LessonProgress lessonProgress left join fetch lessonProgress.student left join fetch lessonProgress.courseItem where lessonProgress.id =:id"
     )
     Optional<LessonProgress> findOneWithToOneRelationships(@Param("id") Long id);
+
+    List<LessonProgress> findByCourseItemId(Long courseItemId);
 }

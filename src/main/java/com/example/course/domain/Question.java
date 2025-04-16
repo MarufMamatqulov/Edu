@@ -35,6 +35,10 @@ public class Question implements Serializable {
     @Column(name = "options", nullable = false)
     private String options;
 
+    @NotNull
+    @Column(name = "correct_answer", nullable = false)
+    private String correctAnswer;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JsonIgnoreProperties(value = { "course" }, allowSetters = true)
     private CourseItem courseItem;
@@ -65,6 +69,14 @@ public class Question implements Serializable {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public String getCorrectAnswer() {
+        return correctAnswer;
+    }
+
+    public void setCorrectAnswer(String correctAnswer) {
+        this.correctAnswer = correctAnswer;
     }
 
     public QuestionType getType() {

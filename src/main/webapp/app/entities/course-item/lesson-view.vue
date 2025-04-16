@@ -1,28 +1,3 @@
-<!-- src/main/webapp/app/entities/course/lesson-view.vue -->
-<template>
-  <div class="lesson-view-container">
-    <h2 class="lesson-title">{{ lesson?.title }}</h2>
-    <div v-if="isFetching" class="alert alert-info text-center">Yuklanmoqda...</div>
-    <div v-else-if="lesson" class="lesson-content">
-      <div v-if="lesson.contentType === 'YOUTUBE_VIDEO'" class="video-wrapper">
-        <iframe
-          v-if="getYouTubeEmbedUrl(lesson.content)"
-          :src="getYouTubeEmbedUrl(lesson.content)"
-          frameborder="0"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen
-          class="youtube-video"
-        ></iframe>
-        <p v-else class="invalid-video-url">YouTube video URL noto'g'ri: {{ lesson.content }}</p>
-      </div>
-      <div v-else class="text-content">
-        {{ lesson.content }}
-      </div>
-    </div>
-    <div v-else class="alert alert-warning text-center">Dars topilmadi.</div>
-  </div>
-</template>
-
 <script lang="ts">
 import { defineComponent, ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -33,27 +8,65 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const lesson = ref<any>(null);
+    const lessonProgress = ref<any>(null);
     const isFetching = ref(false);
+    const isMarking = ref(false);
+    const errorMessage = ref<string | null>(null);
     const courseId = ref(route.params.courseId);
     const itemId = ref(route.params.itemId);
+    const player = ref<any>(null);
 
     const fetchLesson = async () => {
       isFetching.value = true;
+      errorMessage.value = null;
       try {
         const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
-        if (!token) {
-          throw new Error('No JWT token found');
-        }
+        if (!token) throw new Error('No JWT token found');
         const res = await axios.get(`/api/course-items/${itemId.value}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
+        if (!res.data) throw new Error('Lesson data not found');
         lesson.value = res.data;
       } catch (err) {
         console.error('Error fetching lesson:', err);
+        errorMessage.value = err.response?.status === 401 ? 'Please log in to view this lesson.' : err.message || 'Failed to load lesson.';
       } finally {
         isFetching.value = false;
+      }
+    };
+
+    const fetchLessonProgress = async () => {
+      try {
+        const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
+        const res = await axios.get(`/api/lesson-progresses?courseItemId=${itemId.value}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        lessonProgress.value = res.data[0] || { viewed: false };
+      } catch (err) {
+        console.error('Error fetching lesson progress:', err);
+      }
+    };
+
+    const markAsViewed = async () => {
+      isMarking.value = true;
+      try {
+        const token = localStorage.getItem('jhi-authenticationToken') || sessionStorage.getItem('jhi-authenticationToken');
+        let progressId = lessonProgress.value?.id;
+        if (!progressId) {
+          const res = await axios.post(
+            `/api/lesson-progresses`,
+            { courseItemId: itemId.value, viewed: true, viewedDate: new Date().toISOString() },
+            { headers: { Authorization: `Bearer ${token}` } },
+          );
+          lessonProgress.value = res.data;
+        } else {
+          await axios.patch(`/api/lesson-progresses/${progressId}/mark-viewed`, {}, { headers: { Authorization: `Bearer ${token}` } });
+          lessonProgress.value.viewed = true;
+        }
+      } catch (err) {
+        console.error('Error marking lesson as viewed:', err);
+      } finally {
+        isMarking.value = false;
       }
     };
 
@@ -65,66 +78,66 @@ export default defineComponent({
           console.error('Invalid YouTube URL:', url);
           return '';
         }
-        return `https://www.youtube.com/embed/${videoId}`;
+        return videoId; // Return just the video ID for the player
       } catch (error) {
         console.error('Error parsing YouTube URL:', error);
         return '';
       }
     };
 
+    const onVideoLoad = () => {
+      const videoId = getYouTubeEmbedUrl(lesson.value.content);
+      if (videoId) {
+        player.value = new window.YT.Player('youtube-player', {
+          videoId: videoId,
+          events: {
+            onStateChange: (event: any) => {
+              if (event.data === window.YT.PlayerState.ENDED && !lessonProgress.value?.viewed) {
+                markAsViewed(); // Automatically mark as viewed when the video ends
+              }
+            },
+          },
+        });
+      }
+    };
+
     onMounted(() => {
       fetchLesson();
+      fetchLessonProgress();
     });
 
     return {
       lesson,
+      lessonProgress,
       isFetching,
+      isMarking,
+      errorMessage,
       getYouTubeEmbedUrl,
+      markAsViewed,
+      onVideoLoad,
     };
   },
 });
 </script>
 
-<style scoped>
-.lesson-view-container {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
-}
-
-.lesson-title {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-.video-wrapper {
-  position: relative;
-  padding-bottom: 56.25%; /* 16:9 aspect ratio */
-  height: 0;
-  overflow: hidden;
-}
-
-.youtube-video {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-}
-
-.invalid-video-url {
-  font-size: 0.9rem;
-  color: #dc3545;
-  font-style: italic;
-}
-
-.text-content {
-  font-size: 1rem;
-  color: #333;
-}
-
-.text-center {
-  text-align: center;
-}
-</style>
+<template>
+  <div class="lesson-view-container">
+    <h2 class="lesson-title">{{ lesson?.title }}</h2>
+    <div v-if="isFetching" class="alert alert-info text-center">Yuklanmoqda...</div>
+    <div v-else-if="errorMessage" class="alert alert-danger text-center">
+      {{ errorMessage }}
+    </div>
+    <div v-else-if="lesson" class="lesson-content">
+      <div v-if="lesson.contentType === 'YOUTUBE_VIDEO'" class="video-wrapper">
+        <div id="youtube-player" class="youtube-video"></div>
+        <p v-if="!getYouTubeEmbedUrl(lesson.content)" class="invalid-video-url">YouTube video URL noto'g'ri: {{ lesson.content }}</p>
+      </div>
+      <div v-else class="text-content">{{ lesson.content }}</div>
+      <button v-if="!lessonProgress?.viewed" @click="markAsViewed" class="btn btn-primary mt-3" :disabled="isMarking">
+        Darsni tugatish
+      </button>
+      <p v-else class="text-success mt-3">Dars tugallangan!</p>
+    </div>
+    <div v-else class="alert alert-warning text-center">Dars topilmadi.</div>
+  </div>
+</template>

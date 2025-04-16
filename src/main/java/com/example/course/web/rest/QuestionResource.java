@@ -186,4 +186,10 @@ public class QuestionResource {
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
     }
+
+    @GetMapping("/by-course-item/{courseItemId}")
+    public List<Question> getQuestionsByCourseItem(@PathVariable Long courseItemId) {
+        LOG.debug("REST request to get Questions for CourseItem: {}", courseItemId);
+        return questionRepository.findByCourseItemId(courseItemId);
+    }
 }

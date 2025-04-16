@@ -1,10 +1,17 @@
 package com.example.course.web.rest;
 
+import com.example.course.domain.CourseItem;
+import com.example.course.domain.Question;
 import com.example.course.domain.TestAttempt;
+import com.example.course.repository.CourseItemRepository;
+import com.example.course.repository.QuestionRepository;
 import com.example.course.repository.TestAttemptRepository;
+import com.example.course.service.dto.TestAttemptDTO;
 import com.example.course.web.rest.errors.BadRequestAlertException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -18,7 +25,7 @@ import tech.jhipster.web.util.HeaderUtil;
 import tech.jhipster.web.util.ResponseUtil;
 
 /**
- * REST controller for managing {@link com.example.course.domain.TestAttempt}.
+ * REST controller for managing {@link TestAttempt}.
  */
 @RestController
 @RequestMapping("/api/test-attempts")
@@ -34,24 +41,65 @@ public class TestAttemptResource {
 
     private final TestAttemptRepository testAttemptRepository;
 
-    public TestAttemptResource(TestAttemptRepository testAttemptRepository) {
+    private final CourseItemRepository courseItemRepository;
+
+    private final QuestionRepository questionRepository;
+
+    public TestAttemptResource(
+        TestAttemptRepository testAttemptRepository,
+        CourseItemRepository courseItemRepository,
+        QuestionRepository questionRepository
+    ) {
         this.testAttemptRepository = testAttemptRepository;
+        this.courseItemRepository = courseItemRepository;
+        this.questionRepository = questionRepository;
     }
 
     /**
      * {@code POST  /test-attempts} : Create a new testAttempt.
      *
-     * @param testAttempt the testAttempt to create.
+     * @param testAttemptDTO the testAttempt to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new testAttempt, or with status {@code 400 (Bad Request)} if the testAttempt has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("")
-    public ResponseEntity<TestAttempt> createTestAttempt(@RequestBody TestAttempt testAttempt) throws URISyntaxException {
-        LOG.debug("REST request to save TestAttempt : {}", testAttempt);
-        if (testAttempt.getId() != null) {
-            throw new BadRequestAlertException("A new testAttempt cannot already have an ID", ENTITY_NAME, "idexists");
+    public ResponseEntity<TestAttempt> createTestAttempt(@RequestBody TestAttemptDTO testAttemptDTO) throws URISyntaxException {
+        LOG.debug("REST request to save TestAttempt : {}", testAttemptDTO);
+        if (testAttemptDTO.getCourseItemId() == null) {
+            throw new BadRequestAlertException("CourseItem ID is required", ENTITY_NAME, "courseItemIdnull");
         }
+
+        CourseItem courseItem = courseItemRepository
+            .findById(testAttemptDTO.getCourseItemId())
+            .orElseThrow(() -> new BadRequestAlertException("CourseItem not found", ENTITY_NAME, "courseItemnotfound"));
+
+        List<Question> questions = questionRepository.findByCourseItemId(testAttemptDTO.getCourseItemId());
+        if (questions.isEmpty()) {
+            throw new BadRequestAlertException("No questions found for this test", ENTITY_NAME, "noquestions");
+        }
+
+        // Calculate score
+        int score = 0;
+        for (Question question : questions) {
+            String selectedAnswer = testAttemptDTO
+                .getAnswers()
+                .stream()
+                .filter(a -> a.getQuestionId().equals(question.getId()))
+                .findFirst()
+                .map(TestAttemptDTO.AnswerDTO::getSelectedAnswer)
+                .orElse(null);
+            if (selectedAnswer != null && selectedAnswer.equals(question.getCorrectAnswer())) { // Assume correctAnswer field exists
+                score++;
+            }
+        }
+
+        TestAttempt testAttempt = new TestAttempt();
+        testAttempt.setCourseItem(courseItem);
+        testAttempt.setScore(score);
+        testAttempt.setPassed(score >= courseItem.getPassingScore());
+        testAttempt.setAttemptDate(Instant.from(LocalDateTime.now()));
         testAttempt = testAttemptRepository.save(testAttempt);
+
         return ResponseEntity.created(new URI("/api/test-attempts/" + testAttempt.getId()))
             .headers(HeaderUtil.createEntityCreationAlert(applicationName, true, ENTITY_NAME, testAttempt.getId().toString()))
             .body(testAttempt);

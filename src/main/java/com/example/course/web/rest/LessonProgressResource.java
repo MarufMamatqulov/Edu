@@ -7,6 +7,8 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -149,9 +151,13 @@ public class LessonProgressResource {
      */
     @GetMapping("")
     public List<LessonProgress> getAllLessonProgresses(
-        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload
+        @RequestParam(name = "eagerload", required = false, defaultValue = "true") boolean eagerload,
+        @RequestParam(name = "courseItemId", required = false) Long courseItemId
     ) {
-        LOG.debug("REST request to get all LessonProgresses");
+        LOG.debug("REST request to get LessonProgresses for courseItemId: {}", courseItemId);
+        if (courseItemId != null) {
+            return lessonProgressRepository.findByCourseItemId(courseItemId);
+        }
         if (eagerload) {
             return lessonProgressRepository.findAllWithEagerRelationships();
         } else {
@@ -185,5 +191,21 @@ public class LessonProgressResource {
         return ResponseEntity.noContent()
             .headers(HeaderUtil.createEntityDeletionAlert(applicationName, true, ENTITY_NAME, id.toString()))
             .build();
+    }
+
+    @PatchMapping("/{id}/mark-viewed")
+    public ResponseEntity<LessonProgress> markLessonViewed(@PathVariable Long id) throws URISyntaxException {
+        LOG.debug("REST request to mark LessonProgress as viewed: {}", id);
+        Optional<LessonProgress> progressOpt = lessonProgressRepository.findById(id);
+        if (!progressOpt.isPresent()) {
+            throw new BadRequestAlertException("LessonProgress not found", ENTITY_NAME, "idnotfound");
+        }
+        LessonProgress progress = progressOpt.get();
+        progress.setViewed(true);
+        progress.setViewedDate(Instant.from(LocalDateTime.now()));
+        progress = lessonProgressRepository.save(progress);
+        return ResponseEntity.ok()
+            .headers(HeaderUtil.createEntityUpdateAlert(applicationName, true, ENTITY_NAME, id.toString()))
+            .body(progress);
     }
 }

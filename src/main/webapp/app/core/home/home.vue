@@ -9,9 +9,19 @@
       </div>
     </div>
 
+    <!-- Career Quiz Banner -->
+    <div class="career-quiz-banner text-center">
+      <h3 class="quiz-title" v-text="t$('home.careerQuiz.title')"></h3>
+      <p class="quiz-description" v-text="t$('home.careerQuiz.description')"></p>
+      <a href="https://www.ambitiousimpact.com/quiz" target="_blank" class="quiz-button">
+        <i class="fas fa-question-circle"></i>
+        <span v-text="t$('home.careerQuiz.button')"></span>
+      </a>
+    </div>
+
     <!-- Loading State -->
     <div v-if="loading" class="text-center">
-      <p>Loading courses...</p>
+      <p v-text="t$('home.loading')"></p>
     </div>
 
     <!-- Course List -->
@@ -27,12 +37,12 @@
           <h3 class="course-title">{{ course.title }}</h3>
           <p class="course-description">{{ course.description }}</p>
           <p class="course-price">
-            {{ course.price && course.price > 0 ? course.price + ' so‘m' : 'Bepul' }}
+            {{ course.price && course.price > 0 ? course.price + ' so‘m' : t$('home.course.free') }}
           </p>
 
           <!-- Course Items (YouTube Videos) -->
           <div v-if="course.items && course.items.length > 0" class="course-items">
-            <h4>YouTube Videolar</h4>
+            <h4 v-text="t$('home.course.youtubeVideos')"></h4>
             <div v-for="item in course.items.filter(item => item.contentType === 'YOUTUBE_VIDEO')" :key="item.id" class="course-item">
               <h5>{{ item.title }}</h5>
               <div v-if="getYouTubeEmbedUrl(item.content)" class="video-wrapper">
@@ -44,20 +54,35 @@
                   class="youtube-video"
                 ></iframe>
               </div>
-              <p v-else class="invalid-video-url">YouTube video URL noto'g'ri: {{ item.content }}</p>
+              <p v-else class="invalid-video-url" v-text="t$('home.course.invalidVideoUrl', { url: item.content })"></p>
             </div>
-            <p v-if="!course.items.some(item => item.contentType === 'YOUTUBE_VIDEO')" class="no-videos">
-              Ushbu kursda YouTube videolar mavjud emas.
-            </p>
+            <p
+              v-if="!course.items.some(item => item.contentType === 'YOUTUBE_VIDEO')"
+              class="no-videos"
+              v-text="t$('home.course.noVideos')"
+            ></p>
           </div>
-          <div v-else class="no-videos">Ushbu kursda hech qanday elementlar mavjud emas.</div>
+          <div v-else class="no-videos" v-text="t$('home.course.noItems')"></div>
         </div>
-        <button class="course-start-button" @click="goToCourseItems(course.id)">Boshlash</button>
+        <button class="course-start-button" @click="goToCourseItems(course.id)" v-text="t$('home.course.startButton')"></button>
       </div>
 
       <!-- Fallback if no courses -->
-      <p v-if="!courses.length" class="text-center no-courses">No courses available at the moment.</p>
+      <p v-if="!courses.length" class="text-center no-courses" v-text="t$('home.noCourses')"></p>
     </div>
+
+    <!-- IELTS Writing Test Banner -->
+    <div class="ielts-writing-banner text-center">
+      <h3 class="ielts-title" v-text="t$('home.ieltsWriting.title')"></h3>
+      <p class="ielts-description" v-text="t$('home.ieltsWriting.description')"></p>
+      <a href="http://localhost:5173/" target="_blank" class="ielts-button">
+        <i class="fas fa-pen"></i>
+        <span v-text="t$('home.ieltsWriting.button')"></span>
+      </a>
+    </div>
+
+    <!-- Chatbot komponenti -->
+    <chatbot />
   </div>
 </template>
 
@@ -65,9 +90,13 @@
 import { defineComponent, onMounted, ref } from 'vue';
 import CourseService from '@/entities/course/course.service';
 import axios from 'axios';
+import Chatbot from '@/components/Chatbot.vue';
 
 export default defineComponent({
   name: 'Home',
+  components: {
+    Chatbot,
+  },
   setup() {
     const courses = ref<any[]>([]);
     const loading = ref(true);
@@ -151,17 +180,120 @@ export default defineComponent({
       loading,
       goToCourseItems,
       getYouTubeEmbedUrl,
-      t$: (key: string) => key,
+      t$: (key: string, params?: any) => key, // Bu funksiya i18n tomonidan avtomatik almashtiriladi
     };
   },
 });
 </script>
 
 <style scoped>
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
 .home-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 20px;
+}
+
+/* Career Quiz Banner Styles */
+.career-quiz-banner {
+  background: linear-gradient(135deg, #007bff, #00d4ff);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  transition: transform 0.3s ease;
+}
+
+.career-quiz-banner:hover {
+  transform: translateY(-5px);
+}
+
+.quiz-title {
+  font-size: 1.8rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.quiz-description {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.quiz-button {
+  display: inline-flex;
+  align-items: center;
+  background-color: #fff;
+  color: #007bff;
+  padding: 12px 24px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: bold;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.quiz-button:hover {
+  background-color: #0056b3;
+  color: #fff;
+}
+
+.quiz-button i {
+  margin-right: 8px;
+}
+
+/* IELTS Writing Test Banner Styles */
+.ielts-writing-banner {
+  background: linear-gradient(135deg, #28a745, #20c997);
+  border-radius: 12px;
+  padding: 30px;
+  margin: 20px 0;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  color: #fff;
+  transition: transform 0.3s ease;
+  font-family: 'Poppins', sans-serif;
+}
+
+.ielts-writing-banner:hover {
+  transform: translateY(-5px);
+}
+
+.ielts-title {
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 10px;
+}
+
+.ielts-description {
+  font-size: 1.1rem;
+  margin-bottom: 20px;
+}
+
+.ielts-button {
+  display: inline-flex;
+  align-items: center;
+  background-color: #fff;
+  color: #28a745;
+  padding: 12px 24px;
+  border-radius: 25px;
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: 600;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+.ielts-button:hover {
+  background-color: #218838;
+  color: #fff;
+}
+
+.ielts-button i {
+  margin-right: 8px;
 }
 
 .course-card-list {
@@ -271,5 +403,28 @@ export default defineComponent({
   font-size: 1.1rem;
   color: #666;
   margin-top: 20px;
+}
+
+@media (max-width: 768px) {
+  .career-quiz-banner,
+  .ielts-writing-banner {
+    padding: 20px;
+  }
+
+  .quiz-title,
+  .ielts-title {
+    font-size: 1.5rem;
+  }
+
+  .quiz-description,
+  .ielts-description {
+    font-size: 1rem;
+  }
+
+  .quiz-button,
+  .ielts-button {
+    padding: 10px 20px;
+    font-size: 0.9rem;
+  }
 }
 </style>

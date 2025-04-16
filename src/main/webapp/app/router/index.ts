@@ -12,17 +12,12 @@ export const createRouter = () =>
   createVueRouter({
     history: createWebHistory(),
     routes: [
-      {
-        path: '/',
-        name: 'Home',
-        component: Home,
-      },
+      { path: '/', name: 'Home', component: Home },
       {
         path: '/course/:courseId/items',
         name: 'CourseItems',
-        component: () => import('@/entities/course-item/course-items.vue'), // Yangi component
+        component: () => import('@/entities/course-item/course-items.vue'),
       },
-
       {
         path: '/course/:courseId/lesson/:itemId',
         name: 'LessonView',
@@ -33,18 +28,6 @@ export const createRouter = () =>
         name: 'TestView',
         component: TestView,
       },
-
-      {
-        path: '/course/:courseId/lesson/:itemId',
-        name: 'LessonView',
-        component: () => import('@/entities/course-item/lesson-view.vue'),
-      },
-      {
-        path: '/course/:courseId/test/:itemId',
-        name: 'TestView',
-        component: () => import('@/entities/course-item/test-view.vue'),
-      },
-
       {
         path: '/forbidden',
         name: 'Forbidden',

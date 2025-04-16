@@ -1,37 +1,26 @@
 {
   "home": {
-    "entity": {
-      "action": {
-        "start": "Boshlash"
-      }
+    "title": "Xush kelibsiz!",
+    "subtitle": "O‘zingizga mos kurslarni toping va bilim oling.",
+    "loading": "Kurslar yuklanmoqda...",
+    "noCourses": "Hozirda kurslar mavjud emas.",
+    "course": {
+      "free": "Bepul",
+      "youtubeVideos": "YouTube Videolar",
+      "noVideos": "Ushbu kursda YouTube videolar mavjud emas.",
+      "noItems": "Ushbu kursda hech qanday elementlar mavjud emas.",
+      "invalidVideoUrl": "YouTube video URL noto‘g‘ri: {url}",
+      "startButton": "Boshlash"
     },
-    "onlineCoursePlatformApp": {
-      "courseItem": {
-        "home": {
-          "title": "Course Itemlar ro'yxati",
-          "notFound": "Hech qanday item topilmadi."
-        },
-        "title": "Sarlavha",
-        "itemType": "Turi",
-        "contentType": "Kontent Turi",
-        "passingScore": "O'tish Balli"
-      }
+    "careerQuiz": {
+      "title": "Kasbingizni aniqlang!",
+      "description": "Bepul test orqali o‘zingizga mos keladigan karyera yo‘lini toping.",
+      "button": "Testni boshlash"
     },
-
-    "title": "Onlyn ta'lim platformasiga, hush kelibsiz!",
-    "subtitle": "Bosh sahifa",
-    "logged": {
-      "message": "Siz \"{ username }\" foydalanuvchisi sifatida kirdiz."
-    },
-    "question": "Platforma bo`yicha savollaringiz bo`lsa:",
-    "link": {
-      "homepage": "Platforma bosh sahifasi",
-      "stackoverflow": "JHipster Stack Overflow",
-      "bugtracker": "JHipster bag trekeri",
-      "chat": "JHipster umumiy chat xonasi",
-      "follow": "Twitterdagi logini {'@'}jhipster"
-    },
-    "like": "Agar JHipster sizga yoqsa, ushbu manzilda yulduzcha quyishni ununmang",
-    "github": "GitHub"
+    "ieltsWriting": {
+      "title": "IELTS Writing Test bilan yozuv mahoratingizni sinab ko‘ring!",
+      "description": "Bepul test orqali IELTS Writing ko‘nikmalaringizni baholang va o‘zingizni takomillashtiring.",
+      "button": "Testni boshlash"
+    }
   }
 }

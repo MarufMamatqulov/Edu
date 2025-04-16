@@ -1,19 +1,26 @@
 {
   "home": {
-    "title": "Добро пожаловать, платформу онлайн-обучения!",
-    "subtitle": "Это ваша домашняя страница",
-    "logged": {
-      "message": "Вы вошли как пользователь \"{ username }\"."
+    "title": "Добро пожаловать!",
+    "subtitle": "Найдите подходящие курсы и получайте знания.",
+    "loading": "Загрузка курсов...",
+    "noCourses": "На данный момент курсы отсутствуют.",
+    "course": {
+      "free": "Бесплатно",
+      "youtubeVideos": "Видео на YouTube",
+      "noVideos": "В этом курсе нет видео на YouTube.",
+      "noItems": "В этом курсе нет элементов.",
+      "invalidVideoUrl": "Неверный URL видео на YouTube: {url}",
+      "startButton": "Начать"
     },
-    "question": "Если у Вас возникли вопросы по платформу:",
-    "link": {
-      "homepage": "платформу домашняя страница",
-      "stackoverflow": "JHipster на Stack Overflow",
-      "bugtracker": "JHipster баг трекер",
-      "chat": "JHipster public chat room",
-      "follow": "пользователь {'@'}jhipster в Twitter"
+    "careerQuiz": {
+      "title": "Определите свою профессию!",
+      "description": "Пройдите бесплатный тест и найдите подходящую для вас карьеру.",
+      "button": "Начать тест"
     },
-    "like": "Если вам нравится JHipster, не забудьте дать нам звёздочку на",
-    "github": "GitHub"
+    "ieltsWriting": {
+      "title": "Проверьте свои навыки письма с IELTS Writing Test!",
+      "description": "Оцените свои навыки письма для IELTS с помощью бесплатного теста и совершенствуйтесь.",
+      "button": "Начать тест"
+    }
   }
 }
