@@ -46,12 +46,12 @@
 
     <!-- Chatbot yopiq holatda -->
     <button v-else @click="open = true" class="chatbot-toggle-btn">
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path
           stroke-linecap="round"
           stroke-linejoin="round"
           stroke-width="2"
-          d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"
+          d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H7a2 2 0 01-2-2v-6a2 2 0 012-2h2m-2 6h6m-2-4h2"
         />
       </svg>
     </button>
@@ -68,7 +68,7 @@ export default defineComponent({
     const messages = ref<any[]>([{ role: 'assistant', content: 'Salom! Kurs platformamiz haqida savolingiz bormi?' }]);
     const input = ref('');
     const loading = ref(false);
-    const open = ref(true); // Boshlang‘ich holatda ochiq
+    const open = ref(false); // Boshlang‘ich holatda yopiq
 
     const sendMessage = async () => {
       if (!input.value.trim()) return;
@@ -149,6 +149,7 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  position: relative;
 }
 
 .chatbot-title {
@@ -161,11 +162,26 @@ export default defineComponent({
   border: none;
   color: white;
   cursor: pointer;
-  transition: transform 0.2s;
+  padding: 4px;
+  z-index: 10;
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  transition:
+    opacity 0.2s,
+    transform 0.2s;
+}
+
+.close-btn svg {
+  stroke: white;
+  width: 20px;
+  height: 20px;
 }
 
 .close-btn:hover {
-  transform: rotate(90deg);
+  opacity: 0.8;
+  transform: translateY(-50%) rotate(90deg);
 }
 
 .chatbot-messages {
@@ -297,16 +313,26 @@ export default defineComponent({
 }
 
 .chatbot-toggle-btn {
-  background: linear-gradient(90deg, #007bff, #00c4ff);
-  padding: 12px;
+  background: linear-gradient(135deg, #4f46e5, #7c3aed);
+  padding: 14px;
   border-radius: 50%;
   border: none;
   color: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  transition:
+    transform 0.3s ease,
+    box-shadow 0.3s ease;
 }
 
 .chatbot-toggle-btn:hover {
-  transform: scale(1.1);
+  transform: scale(1.15);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.chatbot-toggle-btn svg {
+  width: 28px;
+  height: 28px;
+  stroke: white;
+  stroke-width: 2;
 }
 </style>
