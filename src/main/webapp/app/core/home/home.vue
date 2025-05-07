@@ -4,45 +4,40 @@
     <!-- Header Section -->
     <div class="row">
       <div class="col-md-12 text-center">
-        <h1 class="display-4" v-text="t$('home.title')"></h1>
-        <p class="lead" v-text="t$('home.subtitle')"></p>
+        <h1 class="display-4" v-text="$t('home.title')"></h1>
+        <p class="lead" v-text="$t('home.subtitle')"></p>
       </div>
     </div>
 
     <!-- Career Quiz Banner -->
     <div class="career-quiz-banner text-center">
-      <h3 class="quiz-title" v-text="t$('home.careerQuiz.title')"></h3>
-      <p class="quiz-description" v-text="t$('home.careerQuiz.description')"></p>
+      <h3 class="quiz-title" v-text="$t('home.careerQuiz.title')"></h3>
+      <p class="quiz-description" v-text="$t('home.careerQuiz.description')"></p>
       <a href="https://www.ambitiousimpact.com/quiz" target="_blank" class="quiz-button">
         <i class="fas fa-question-circle"></i>
-        <span v-text="t$('home.careerQuiz.button')"></span>
+        <span v-text="$t('home.careerQuiz.button')"></span>
       </a>
     </div>
 
     <!-- Loading State -->
     <div v-if="loading" class="text-center">
-      <p v-text="t$('home.loading')"></p>
+      <p v-text="$t('home.loading')"></p>
     </div>
 
     <!-- Course List -->
     <div v-else class="course-card-list">
-      <div
-        v-for="course in courses"
-        :key="course.id"
-        class="course-card"
-        v-bind="course as { id: number; title: string; description: string; price: number; imageUrl: string | null }"
-      >
+      <div v-for="course in courses" :key="course.id" class="course-card">
         <img v-if="course.imageUrl" :src="course.imageUrl" class="course-image" alt="Course Image" />
         <div class="course-body">
           <h3 class="course-title">{{ course.title }}</h3>
           <p class="course-description">{{ course.description }}</p>
           <p class="course-price">
-            {{ course.price && course.price > 0 ? course.price + ' so‘m' : t$('home.course.free') }}
+            {{ course.price && course.price > 0 ? course.price + ' so‘m' : $t('home.course.free') }}
           </p>
 
           <!-- Course Items (YouTube Videos) -->
           <div v-if="course.items && course.items.length > 0" class="course-items">
-            <h4 v-text="t$('home.course.youtubeVideos')"></h4>
+            <h4 v-text="$t('home.course.youtubeVideos')"></h4>
             <div v-for="item in course.items.filter(item => item.contentType === 'YOUTUBE_VIDEO')" :key="item.id" class="course-item">
               <h5>{{ item.title }}</h5>
               <div v-if="getYouTubeEmbedUrl(item.content)" class="video-wrapper">
@@ -54,30 +49,30 @@
                   class="youtube-video"
                 ></iframe>
               </div>
-              <p v-else class="invalid-video-url" v-text="t$('home.course.invalidVideoUrl', { url: item.content })"></p>
+              <p v-else class="invalid-video-url" v-text="$t('home.course.invalidVideoUrl', { url: item.content })"></p>
             </div>
             <p
               v-if="!course.items.some(item => item.contentType === 'YOUTUBE_VIDEO')"
               class="no-videos"
-              v-text="t$('home.course.noVideos')"
+              v-text="$t('home.course.noVideos')"
             ></p>
           </div>
-          <div v-else class="no-videos" v-text="t$('home.course.noItems')"></div>
+          <div v-else class="no-videos" v-text="$t('home.course.noItems')"></div>
         </div>
-        <button class="course-start-button" @click="goToCourseItems(course.id)" v-text="t$('home.course.startButton')"></button>
+        <button class="course-start-button" @click="goToCourseItems(course.id)" v-text="$t('home.course.startButton')"></button>
       </div>
 
       <!-- Fallback if no courses -->
-      <p v-if="!courses.length" class="text-center no-courses" v-text="t$('home.noCourses')"></p>
+      <p v-if="!courses.length" class="text-center no-courses" v-text="$t('home.noCourses')"></p>
     </div>
 
     <!-- IELTS Writing Test Banner -->
     <div class="ielts-writing-banner text-center">
-      <h3 class="ielts-title" v-text="t$('home.ieltsWriting.title')"></h3>
-      <p class="ielts-description" v-text="t$('home.ieltsWriting.description')"></p>
+      <h3 class="ielts-title" v-text="$t('home.ieltsWriting.title')"></h3>
+      <p class="ielts-description" v-text="$t('home.ieltsWriting.description')"></p>
       <a href="http://localhost:5173/" target="_blank" class="ielts-button">
         <i class="fas fa-pen"></i>
-        <span v-text="t$('home.ieltsWriting.button')"></span>
+        <span v-text="$t('home.ieltsWriting.button')"></span>
       </a>
     </div>
 
@@ -88,6 +83,7 @@
 
 <script lang="ts">
 import { defineComponent, onMounted, ref } from 'vue';
+import { useI18n } from 'vue-i18n';
 import CourseService from '@/entities/course/course.service';
 import axios from 'axios';
 import Chatbot from '@/components/Chatbot.vue';
@@ -98,6 +94,7 @@ export default defineComponent({
     Chatbot,
   },
   setup() {
+    const { t: $t } = useI18n();
     const courses = ref<any[]>([]);
     const loading = ref(true);
     const courseService = new CourseService();
@@ -180,7 +177,7 @@ export default defineComponent({
       loading,
       goToCourseItems,
       getYouTubeEmbedUrl,
-      t$: (key: string, params?: any) => key, // Bu funksiya i18n tomonidan avtomatik almashtiriladi
+      $t,
     };
   },
 });
