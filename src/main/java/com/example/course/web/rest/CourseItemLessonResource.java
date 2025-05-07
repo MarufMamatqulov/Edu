@@ -64,11 +64,9 @@ public class CourseItemLessonResource { // /course/${courseId}/items`
     ) throws URISyntaxException, IOException {
         LOG.debug("REST request to add lesson to Course id: {}, title: {}, contentType: {}", courseId, title, contentType);
 
-        Optional<Course> courseOpt = courseRepository.findById(courseId);
-        if (!courseOpt.isPresent()) {
-            throw new BadRequestAlertException("Course not found", "course", "notfound");
-        }
-        Course course = courseOpt.get();
+        Course course = courseRepository
+            .findById(courseId)
+            .orElseThrow(() -> new BadRequestAlertException("Course not found", "course", "notfound"));
 
         CourseItem lesson = new CourseItem();
         lesson.setTitle(title);

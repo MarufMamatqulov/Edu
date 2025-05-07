@@ -27,6 +27,9 @@ public class StaticResourcesWebConfiguration implements WebMvcConfigurer {
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         ResourceHandlerRegistration resourceHandlerRegistration = appendResourceHandler(registry);
         initializeResourceHandler(resourceHandlerRegistration);
+
+        // Add resource handler for videos
+        registry.addResourceHandler("/videos/**").addResourceLocations("classpath:/static/videos/").setCacheControl(getCacheControl());
     }
 
     protected ResourceHandlerRegistration appendResourceHandler(ResourceHandlerRegistry registry) {

@@ -200,7 +200,9 @@ public class LessonProgressResource {
         if (!progressOpt.isPresent()) {
             throw new BadRequestAlertException("LessonProgress not found", ENTITY_NAME, "idnotfound");
         }
-        LessonProgress progress = progressOpt.get();
+        LessonProgress progress = progressOpt.orElseThrow(() ->
+            new BadRequestAlertException("LessonProgress not found", ENTITY_NAME, "idnotfound")
+        );
         progress.setViewed(true);
         progress.setViewedDate(Instant.from(LocalDateTime.now()));
         progress = lessonProgressRepository.save(progress);

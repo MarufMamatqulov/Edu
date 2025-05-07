@@ -25,6 +25,21 @@
             {{ course.author ? course.author.username : '' }}
           </dd>
         </dl>
+
+        <!-- Video Lessons Section -->
+        <div v-if="course.videoLessons && course.videoLessons.length > 0">
+          <h3 v-text="t$('onlineCoursePlatformApp.course.videoLessons')"></h3>
+          <ul>
+            <li v-for="video in course.videoLessons" :key="video.id">
+              <h4>{{ video.title }}</h4>
+              <video controls width="100%">
+                <source :src="video.videoUrl" type="video/mp4" />
+                {{ t$('onlineCoursePlatformApp.course.videoNotSupported') }}
+              </video>
+            </li>
+          </ul>
+        </div>
+
         <button type="submit" @click.prevent="previousState()" class="btn btn-info" data-cy="entityDetailsBackButton">
           <font-awesome-icon icon="arrow-left"></font-awesome-icon>&nbsp;<span v-text="t$('entity.action.back')"></span>
         </button>

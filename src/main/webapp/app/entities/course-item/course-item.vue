@@ -35,6 +35,7 @@
             <th scope="row"><span v-text="t$('onlineCoursePlatformApp.courseItem.content')"></span></th>
             <th scope="row"><span v-text="t$('onlineCoursePlatformApp.courseItem.passingScore')"></span></th>
             <th scope="row"><span v-text="t$('onlineCoursePlatformApp.courseItem.course')"></span></th>
+            <th scope="row"><span v-text="t$('onlineCoursePlatformApp.courseItem.video')"></span></th>
             <th scope="row"></th>
           </tr>
         </thead>
@@ -53,6 +54,14 @@
                 <router-link :to="{ name: 'CourseView', params: { courseId: courseItem.course.id } }">{{
                   courseItem.course.title
                 }}</router-link>
+              </div>
+            </td>
+            <td>
+              <div v-if="courseItem.videoUrl">
+                <video controls width="250">
+                  <source :src="courseItem.videoUrl" type="video/mp4" />
+                  {{ t$('onlineCoursePlatformApp.courseItem.videoNotSupported') }}
+                </video>
               </div>
             </td>
             <td class="text-right">

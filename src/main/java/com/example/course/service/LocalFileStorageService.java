@@ -18,7 +18,7 @@ public class LocalFileStorageService implements FileStorageService {
         // Unikal fayl nomini yaratish
         String originalFilename = file.getOriginalFilename();
         String fileName = UUID.randomUUID().toString() + "_" + originalFilename;
-        Path targetLocation = Paths.get(uploadDir).toAbsolutePath().normalize().resolve(fileName);
+        Path targetLocation = Path.of(uploadDir).toAbsolutePath().normalize().resolve(fileName);
         // Agar papka mavjud bo'lmasa, yaratish
         Files.createDirectories(targetLocation.getParent());
         Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);

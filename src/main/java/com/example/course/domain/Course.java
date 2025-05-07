@@ -3,6 +3,8 @@ package com.example.course.domain;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A Course.
@@ -29,6 +31,9 @@ public class Course implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private User author;
+
+    @OneToMany(mappedBy = "course", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<VideoLesson> videoLessons = new ArrayList<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
 
@@ -82,6 +87,14 @@ public class Course implements Serializable {
     public Course author(User user) {
         this.setAuthor(user);
         return this;
+    }
+
+    public List<VideoLesson> getVideoLessons() {
+        return videoLessons;
+    }
+
+    public void setVideoLessons(List<VideoLesson> videoLessons) {
+        this.videoLessons = videoLessons;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

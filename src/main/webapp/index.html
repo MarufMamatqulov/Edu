@@ -105,6 +105,14 @@
           <!-- end of troubleshooting content -->
         </div>
       </div>
+      <div id="video-upload-section">
+        <h2>Video yuklash</h2>
+        <form id="video-upload-form" enctype="multipart/form-data">
+          <input type="file" id="video-file" name="file" accept="video/*" required />
+          <button type="button" id="upload-button">Yuklash</button>
+        </form>
+        <p id="upload-status"></p>
+      </div>
     </div>
     <noscript>
       <h1>You must enable JavaScript to view this page.</h1>
@@ -120,6 +128,35 @@
           errorElm.style.display = 'block';
         }
       }
+    </script>
+    <script>
+      document.getElementById('upload-button').addEventListener('click', async () => {
+        const fileInput = document.getElementById('video-file');
+        const file = fileInput.files[0];
+        if (!file) {
+          alert('Iltimos, video faylni tanlang!');
+          return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+          const response = await fetch('/api/upload-video', {
+            method: 'POST',
+            body: formData,
+          });
+
+          const result = await response.json();
+          if (response.ok && result.url) {
+            document.getElementById('upload-status').textContent = `Video yuklandi: ${result.url}`;
+          } else {
+            document.getElementById('upload-status').textContent = result.error || 'Video yuklashda xatolik yuz berdi.';
+          }
+        } catch (error) {
+          document.getElementById('upload-status').textContent = 'Server bilan bog‘lanishda xatolik yuz berdi.';
+        }
+      });
     </script>
   </body>
 </html>
