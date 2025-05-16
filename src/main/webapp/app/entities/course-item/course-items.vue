@@ -87,7 +87,7 @@ export default defineComponent({
           throw new Error('No JWT token found in localStorage or sessionStorage');
         }
 
-        const res = await axios.get(`http://13.53.190.127:7777/api/courses/${courseId.value}/items`, {
+        const res = await axios.get(`http://localhost:7777/api/courses/${courseId.value}/items`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

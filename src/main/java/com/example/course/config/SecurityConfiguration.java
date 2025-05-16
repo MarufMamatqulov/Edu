@@ -54,12 +54,12 @@ public class SecurityConfiguration {
                     .contentSecurityPolicy(csp ->
                         csp.policyDirectives(
                             "default-src 'self'; " +
-                            "connect-src 'self' http://localhost:7777 ws://localhost:7777; " +
-                            "script-src 'self' 'unsafe-eval'; " +
+                            "connect-src 'self' http://localhost:7777 ws://localhost:7777 https://api.openai.com; " +
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
                             "style-src 'self' 'unsafe-inline'; " +
-                            "img-src 'self' data:; " +
+                            "img-src 'self' data: https://img.youtube.com https://*.ytimg.com; " +
                             "font-src 'self'; " +
-                            "frame-src 'self'; " +
+                            "frame-src 'self' https://www.youtube.com https://*.youtube.com https://youtube.com https://www.youtube-nocookie.com; " +
                             "object-src 'none'; " +
                             "base-uri 'self'; " +
                             "form-action 'self'"
@@ -69,7 +69,7 @@ public class SecurityConfiguration {
                     .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
                     .permissionsPolicyHeader(permissions ->
                         permissions.policy(
-                            "camera=(), fullscreen=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=()"
+                            "camera=(), fullscreen=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), geolocation=(), gyroscope=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), magnetometer=(), microphone=(), midi=(), payment=(), sync-xhr=(), accelerometer=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), autoplay=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), picture-in-picture=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\")"
                         )
                     )
             )

@@ -66,8 +66,9 @@
           <iframe
             :src="getYouTubeEmbedUrl(selectedItem.content)"
             frameborder="0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
             allowfullscreen
+            referrerpolicy="origin"
             class="youtube-video"
           ></iframe>
         </div>
@@ -205,9 +206,10 @@ export default defineComponent({
     const getYouTubeEmbedUrl = (url: string): string => {
       try {
         const videoIdMatch = url.match(/(?:v=)([^&]+)/) || url.match(/(?:youtu\.be\/)([^?]+)/);
-        const videoId = videoIdMatch ? videoIdMatch[1] : null;
+        const videoId = videoIdMatch ? videoIdMatch[1].split('?')[0] : null;
         if (!videoId) return '';
-        return `https://www.youtube.com/embed/${videoId}`;
+        // Use youtube-nocookie.com which has better privacy and often fewer CSP issues
+        return `https://www.youtube-nocookie.com/embed/${videoId}?rel=0&modestbranding=1`;
       } catch (error) {
         console.error('Error parsing YouTube URL:', error);
         return '';
@@ -218,6 +220,7 @@ export default defineComponent({
       if (item.contentType === 'YOUTUBE_VIDEO') {
         selectedItem.value = item;
         showModal.value = true;
+        console.log('Opening video modal for:', item.content, 'Embed URL:', getYouTubeEmbedUrl(item.content));
       }
     };
 

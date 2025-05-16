@@ -45,7 +45,7 @@ const config = defineConfig({
   },
   define: {
     I18N_HASH: '"generated_hash"',
-    SERVER_API_URL: '"http://13.53.190.127:7777"',
+    SERVER_API_URL: '"http://localhost:7777"',
     APP_VERSION: `"${process.env.APP_VERSION ? process.env.APP_VERSION : 'DEV'}"`,
   },
   server: {

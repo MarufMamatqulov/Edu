@@ -75,7 +75,7 @@ jhipster:
     allow-credentials: true
     max-age: 1800
   security:
-    content-security-policy: "default-src 'self'; connect-src 'self' http://localhost:7777 ws://localhost:7777 https://api.openai.com; script-src 'self' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'; frame-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self'"
+    content-security-policy: "default-src 'self'; connect-src 'self' http://localhost:7777 ws://localhost:7777 https://api.openai.com; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https://img.youtube.com https://*.ytimg.com; font-src 'self'; frame-src 'self' https://www.youtube.com https://*.youtube.com https://youtube.com https://www.youtube-nocookie.com; object-src 'none'; base-uri 'self'; form-action 'self'"
     authentication:
       jwt:
         # This token must be encoded using Base64 and be at least 256 bits long (you can type `openssl rand -base64 64` on your command line to generate a 512 bits one)

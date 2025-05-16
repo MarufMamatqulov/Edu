@@ -3,6 +3,7 @@ package com.example.course.config;
 import static java.net.URLDecoder.decode;
 
 import jakarta.servlet.*;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
@@ -42,6 +43,54 @@ public class WebConfigurer implements ServletContextInitializer, WebServerFactor
         if (env.getActiveProfiles().length != 0) {
             LOG.info("Web application configuration, using profiles: {}", (Object[]) env.getActiveProfiles());
         }
+
+        // Add filter for security headers
+        servletContext
+            .addFilter(
+                "securityHeadersFilter",
+                new Filter() {
+                    @Override
+                    public void init(FilterConfig filterConfig) {
+                        LOG.info("Security Headers Filter initialized");
+                    }
+
+                    @Override
+                    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+                        throws java.io.IOException, ServletException {
+                        HttpServletResponse httpResponse = (HttpServletResponse) response;
+
+                        // Content Security Policy
+                        httpResponse.setHeader(
+                            "Content-Security-Policy",
+                            "default-src 'self'; " +
+                            "script-src 'self' 'unsafe-inline' 'unsafe-eval'; " +
+                            "style-src 'self' 'unsafe-inline'; " +
+                            "frame-src 'self' https://www.youtube.com/ https://*.youtube.com/ https://youtube.com/ https://www.youtube-nocookie.com/; " +
+                            "img-src 'self' data: https://img.youtube.com/ https://*.ytimg.com/"
+                        );
+
+                        // Permissions Policy
+                        httpResponse.setHeader(
+                            "Permissions-Policy",
+                            "fullscreen=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), " +
+                            "gyroscope=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), " +
+                            "accelerometer=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), " +
+                            "autoplay=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), " +
+                            "clipboard-write=(self), " +
+                            "encrypted-media=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\"), " +
+                            "picture-in-picture=(self \"https://www.youtube.com\" \"https://www.youtube-nocookie.com\")"
+                        );
+
+                        chain.doFilter(request, response);
+                    }
+
+                    @Override
+                    public void destroy() {
+                        // Nothing to do
+                    }
+                }
+            )
+            .addMappingForUrlPatterns(null, true, "/*");
 
         LOG.info("Web application fully configured");
     }
